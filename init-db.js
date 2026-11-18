@@ -8,7 +8,7 @@ async function initDb() {
   console.log(' Starting Database Initialization for GarageFlow...');
   console.log('==================================================');
 
-  // Load schema SQL file
+
   const schemaPath = path.join(__dirname, 'database', 'schema.sql');
   if (!fs.existsSync(schemaPath)) {
     console.error(`[Error] Schema file not found at: ${schemaPath}`);
@@ -17,7 +17,7 @@ async function initDb() {
 
   const sqlContent = fs.readFileSync(schemaPath, 'utf8');
 
-  // We connect to MySQL server without database first to create it
+
   let connection;
   try {
     connection = await mysql.createConnection({
@@ -34,9 +34,9 @@ async function initDb() {
   }
 
   try {
-    // Split SQL by semicolons, but ignore semicolons inside single/double quotes or block comments
+
     const statements = sqlContent
-      .split(/;(?=(?:[^']*'[^']*')*[^']*$)/g) // split by semicolon outside quotes
+      .split(/;(?=(?:[^']*'[^']*')*[^']*$)/g)
       .map(stmt => stmt.trim())
       .filter(stmt => stmt.length > 0);
 
@@ -44,7 +44,7 @@ async function initDb() {
 
     for (let i = 0; i < statements.length; i++) {
       const statement = statements[i];
-      // Clean comments and whitespace
+
       const cleaned = statement
         .split('\n')
         .filter(line => !line.trim().startsWith('--') && !line.trim().startsWith('#'))
@@ -52,7 +52,7 @@ async function initDb() {
         .trim();
 
       if (cleaned) {
-        // Show progress for creating database/tables
+
         if (cleaned.toUpperCase().startsWith('CREATE DATABASE')) {
           console.log('[Execute] Creating Database...');
         } else if (cleaned.toUpperCase().startsWith('USE')) {

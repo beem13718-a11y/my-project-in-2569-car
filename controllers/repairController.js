@@ -3,14 +3,14 @@ const path = require('path');
 const fs = require('fs');
 const notificationService = require('../services/notificationService');
 
-// Fetch all repairs with filtering, searching, and pagination
+
 const getAllRepairs = async (req, res) => {
   const search = req.query.search || '';
   const page = parseInt(req.query.page) || 1;
   const limit = 10;
   const offset = (page - 1) * limit;
 
-  // Parse multiple selected statuses
+
   let selectedStatuses = [];
   if (req.query.status) {
     if (Array.isArray(req.query.status)) {
@@ -59,7 +59,7 @@ const getAllRepairs = async (req, res) => {
 
     const [rows] = await db.query(sql, paramsSelect);
 
-    // Get all vehicles and customers for the "Receive car" form dropdowns
+
     const [vehicles] = await db.query(`
       SELECT v.id, v.license_plate, v.brand, v.model, c.fullname AS owner_name 
       FROM vehicles v
@@ -84,12 +84,12 @@ const getAllRepairs = async (req, res) => {
   }
 };
 
-// Fetch specific repair details
+
 const getRepairDetail = async (req, res) => {
   const { id } = req.params;
 
   try {
-    // 1. Get repair main info
+
     const [repairRows] = await db.query(`
       SELECT r.*, c.fullname AS customer_name, c.phone AS customer_phone, c.address AS customer_address, c.email AS customer_email,
              v.license_plate, v.brand, v.model, v.year, v.color, v.vin, u.fullname AS mechanic_name
@@ -106,7 +106,7 @@ const getRepairDetail = async (req, res) => {
 
     const repair = repairRows[0];
 
-    // 2. Get status logs
+
     const [logs] = await db.query(`
       SELECT rl.*, u.fullname AS updated_by_name 
       FROM repair_logs rl
@@ -115,7 +115,7 @@ const getRepairDetail = async (req, res) => {
       ORDER BY rl.created_at DESC
     `, [id]);
 
-    // 3. Get parts used for this repair
+
     const [partsUsed] = await db.query(`
       SELECT rp.*, i.part_name, i.part_number 
       FROM repair_parts rp
@@ -123,10 +123,10 @@ const getRepairDetail = async (req, res) => {
       WHERE rp.repair_id = ?
     `, [id]);
 
-    // 4. Get active mechanics list
+
     const [mechanics] = await db.query("SELECT id, fullname FROM users WHERE role = 'mechanic' AND status = 'active'");
 
-    // 5. Get available spare parts in inventory
+
     const [inventoryParts] = await db.query("SELECT id, part_name, part_number, sell_price, stock_qty FROM inventory WHERE stock_qty > 0 ORDER BY part_name ASC");
 
     res.render('repairs/detail', {
@@ -144,7 +144,7 @@ const getRepairDetail = async (req, res) => {
   }
 };
 
-// Create a new repair job ("รับรถเข้าซ่อม")
+
 const addRepair = async (req, res) => {
   const { vehicle_id, description } = req.body;
   const car_photo_before = req.file ? '/uploads/' + req.file.filename : null;
@@ -157,7 +157,7 @@ const addRepair = async (req, res) => {
   try {
     await conn.beginTransaction();
 
-    // 1. Fetch customer_id from vehicle
+
     const [[vehicle]] = await conn.query(`
       SELECT v.customer_id, c.fullname AS owner_name, v.license_plate 
       FROM vehicles v
@@ -169,7 +169,7 @@ const addRepair = async (req, res) => {
       throw new Error('ไม่พบข้อมูลรถยนต์ที่ระบุ');
     }
 
-    // 2. Insert into repairs table
+
     const insertSql = `
       INSERT INTO repairs (vehicle_id, customer_id, description, status, car_photo_before) 
       VALUES (?, ?, ?, 'pending', ?)
@@ -177,7 +177,7 @@ const addRepair = async (req, res) => {
     const [result] = await conn.query(insertSql, [vehicle_id, vehicle.customer_id, description, car_photo_before]);
     const repairId = result.insertId;
 
-    // 3. Write initial log
+
     await conn.query(`
       INSERT INTO repair_logs (repair_id, status, notes, updated_by) 
       VALUES (?, 'pending', 'ลงทะเบียนรับรถเข้าระบบ พร้อมถ่ายรูปสภาพรถยนต์', ?)
@@ -185,7 +185,7 @@ const addRepair = async (req, res) => {
 
     await conn.commit();
 
-    // Send LINE notify alert asynchronously
+
     notificationService.sendCarReceivedNotification(repairId, vehicle.owner_name, vehicle.license_plate, description)
       .catch(err => console.error('LINE Notify Error:', err));
 
@@ -199,7 +199,7 @@ const addRepair = async (req, res) => {
   }
 };
 
-// Update estimated cost ("สร้างใบเสนอราคา / อนุมัติใบเสนอราคา")
+
 const updateEstimate = async (req, res) => {
   const { id } = req.params;
   const { estimated_cost } = req.body;
@@ -211,13 +211,13 @@ const updateEstimate = async (req, res) => {
   try {
     await db.query('UPDATE repairs SET estimated_cost = ? WHERE id = ?', [estimated_cost, id]);
     
-    // Add log
+
     await db.query(`
       INSERT INTO repair_logs (repair_id, status, notes, updated_by) 
       VALUES (?, 'inspecting', ?, ?)
     `, [id, `บันทึกราคาประเมินค่าซ่อมเบื้องต้น: ${parseFloat(estimated_cost).toLocaleString()} บาท`, req.session.user.id]);
 
-    // Fetch customer details to send LINE Notify
+
     const [[repair]] = await db.query(`
       SELECT r.id, c.fullname 
       FROM repairs r
@@ -235,7 +235,7 @@ const updateEstimate = async (req, res) => {
   }
 };
 
-// Assign mechanic and add parts to the job ("มอบหมายช่าง และเบิกอะไหล่")
+
 const assignMechanicAndParts = async (req, res) => {
   const { id } = req.params;
   const { mechanic_id, part_id, quantity } = req.body;
@@ -244,7 +244,7 @@ const assignMechanicAndParts = async (req, res) => {
   try {
     await conn.beginTransaction();
 
-    // 1. Assign mechanic if provided
+
     if (mechanic_id) {
       await conn.query('UPDATE repairs SET mechanic_id = ? WHERE id = ?', [mechanic_id, id]);
       const [[mechanic]] = await conn.query('SELECT fullname FROM users WHERE id = ?', [mechanic_id]);
@@ -255,44 +255,44 @@ const assignMechanicAndParts = async (req, res) => {
       `, [id, `มอบหมายให้ช่าง: ${mechanic.fullname} เป็นผู้รับผิดชอบงานซ่อม`, req.session.user.id]);
     }
 
-    // 2. Add part & deduct stock if provided
+
     if (part_id && quantity) {
       const qtyToDeduct = parseInt(quantity);
       if (qtyToDeduct <= 0) throw new Error('จำนวนที่เบิกต้องมากกว่า 0');
 
-      // Check stock availability
+
       const [[part]] = await conn.query('SELECT part_name, stock_qty, min_qty, sell_price FROM inventory WHERE id = ?', [part_id]);
       if (!part) throw new Error('ไม่พบอะไหล่ชิ้นนี้ในระบบ');
       if (part.stock_qty < qtyToDeduct) {
         throw new Error(`อะไหล่ "${part.part_name}" มีในสต็อกไม่เพียงพอ (เหลืออยู่ ${part.stock_qty} ชิ้น)`);
       }
 
-      // Check if part already exists in this repair
+
       const [existingPart] = await conn.query('SELECT id, quantity FROM repair_parts WHERE repair_id = ? AND part_id = ?', [id, part_id]);
 
       if (existingPart.length > 0) {
-        // Update quantity in repair_parts
+
         const newQty = existingPart[0].quantity + qtyToDeduct;
         await conn.query('UPDATE repair_parts SET quantity = ? WHERE id = ?', [newQty, existingPart[0].id]);
       } else {
-        // Insert new row
+
         await conn.query(`
           INSERT INTO repair_parts (repair_id, part_id, quantity, sell_price) 
           VALUES (?, ?, ?, ?)
         `, [id, part_id, qtyToDeduct, part.sell_price]);
       }
 
-      // Deduct inventory stock
+
       const remainingStock = part.stock_qty - qtyToDeduct;
       await conn.query('UPDATE inventory SET stock_qty = ? WHERE id = ?', [remainingStock, part_id]);
 
-      // Add log
+
       await conn.query(`
         INSERT INTO repair_logs (repair_id, status, notes, updated_by) 
         VALUES (?, 'waiting_parts', ?, ?)
       `, [id, `เบิกอะไหล่: ${part.part_name} จำนวน ${qtyToDeduct} ชิ้น`, req.session.user.id]);
 
-      // Check for low stock notification
+
       if (remainingStock <= part.min_qty) {
         notificationService.sendLowStockNotification(part.part_name, remainingStock, part.min_qty)
           .catch(err => console.error('LINE Low Stock Notify Error:', err));
@@ -310,7 +310,6 @@ const assignMechanicAndParts = async (req, res) => {
   }
 };
 
-// Update repair progress status
 const updateStatus = async (req, res) => {
   const { id } = req.params;
   const { status, notes } = req.body;
@@ -320,10 +319,29 @@ const updateStatus = async (req, res) => {
     return res.status(400).json({ success: false, message: 'สถานะไม่ถูกต้องตามโครงสร้างระบบ' });
   }
 
+  const conn = await db.getConnection();
   try {
-    await db.query('UPDATE repairs SET status = ? WHERE id = ?', [status, id]);
+    await conn.beginTransaction();
 
-    // Translate status to Thai for log message
+    const [[currentRepair]] = await conn.query('SELECT status FROM repairs WHERE id = ?', [id]);
+    if (!currentRepair) {
+      throw new Error('ไม่พบข้อมูลใบสั่งซ่อม');
+    }
+
+    let returnedPartsNote = '';
+    if (status === 'cancelled' && currentRepair.status !== 'cancelled') {
+      const [usedParts] = await conn.query('SELECT part_id, quantity FROM repair_parts WHERE repair_id = ?', [id]);
+      if (usedParts.length > 0) {
+        for (const item of usedParts) {
+          await conn.query('UPDATE inventory SET stock_qty = stock_qty + ? WHERE id = ?', [item.quantity, item.part_id]);
+        }
+        await conn.query('DELETE FROM repair_parts WHERE repair_id = ?', [id]);
+        returnedPartsNote = ` (คืนสต็อกอะไหล่เข้าคลังอัตโนมัติ ${usedParts.length} รายการ)`;
+      }
+    }
+
+    await conn.query('UPDATE repairs SET status = ? WHERE id = ?', [status, id]);
+
     const statusTextMap = {
       'pending': 'รับรถเข้าระบบ',
       'inspecting': 'กำลังตรวจสภาพ',
@@ -335,21 +353,25 @@ const updateStatus = async (req, res) => {
       'cancelled': 'ยกเลิกใบสั่งซ่อม'
     };
 
-    const logNotes = `เปลี่ยนสถานะเป็น: [${statusTextMap[status]}]` + (notes ? ` - บันทึกย่อ: ${notes}` : '');
+    const logNotes = `เปลี่ยนสถานะเป็น: [${statusTextMap[status]}]${returnedPartsNote}` + (notes ? ` - บันทึกย่อ: ${notes}` : '');
 
-    await db.query(`
+    await conn.query(`
       INSERT INTO repair_logs (repair_id, status, notes, updated_by) 
       VALUES (?, ?, ?, ?)
     `, [id, status, logNotes, req.session.user.id]);
 
-    res.json({ success: true, message: 'อัปเดตสถานะงานซ่อมเรียบร้อยแล้ว' });
+    await conn.commit();
+    res.json({ success: true, message: 'อัปเดตสถานะงานซ่อมเรียบร้อยแล้ว' + returnedPartsNote });
   } catch (err) {
+    await conn.rollback();
     console.error('Update Status Error:', err);
     res.status(500).json({ success: false, message: 'เกิดข้อผิดพลาดในการอัปเดตสถานะ' });
+  } finally {
+    conn.release();
   }
 };
 
-// Close repair job ("บันทึกปิดงาน")
+
 const closeRepair = async (req, res) => {
   const { id } = req.params;
   const { actual_cost, warranty_months } = req.body;
@@ -364,14 +386,14 @@ const closeRepair = async (req, res) => {
   if (months > 0) {
     const d = new Date();
     d.setMonth(d.getMonth() + months);
-    warranty_expire_date = d.toISOString().split('T')[0]; // YYYY-MM-DD
+    warranty_expire_date = d.toISOString().split('T')[0];
   }
 
   const conn = await db.getConnection();
   try {
     await conn.beginTransaction();
 
-    // 1. Get current photo if not uploaded
+
     let photoSql = '';
     const photoParams = [];
     if (car_photo_after) {
@@ -379,7 +401,7 @@ const closeRepair = async (req, res) => {
       photoParams.push(car_photo_after);
     }
 
-    // 2. Update repair
+
     const updateSql = `
       UPDATE repairs 
       SET status = 'ready', actual_cost = ?, warranty_expire_date = ? ${photoSql}
@@ -387,7 +409,7 @@ const closeRepair = async (req, res) => {
     `;
     await conn.query(updateSql, [actual_cost, warranty_expire_date, ...photoParams, id]);
 
-    // 3. Add log
+
     const warrantyText = months > 0 ? `รับประกันงานซ่อมเป็นเวลา ${months} เดือน (ถึงวันที่ ${new Date(warranty_expire_date).toLocaleDateString('th-TH')})` : 'ไม่มีการรับประกันงานซ่อม';
     await conn.query(`
       INSERT INTO repair_logs (repair_id, status, notes, updated_by) 
@@ -396,7 +418,7 @@ const closeRepair = async (req, res) => {
 
     await conn.commit();
 
-    // Fetch customer details to send LINE Completed Notify
+
     const [[repair]] = await db.query(`
       SELECT r.id, c.fullname 
       FROM repairs r
@@ -417,7 +439,7 @@ const closeRepair = async (req, res) => {
   }
 };
 
-// Send full Quotation / Invoice Flex message via LINE
+
 const sendLineInvoice = async (req, res) => {
   const { id } = req.params;
   try {

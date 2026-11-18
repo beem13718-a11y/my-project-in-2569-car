@@ -1,0 +1,96 @@
+<%- include('partials/header') %>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h2 class="page-title mb-1"><i class="fa-solid fa-bell text-warning me-2"></i>ศูนย์รวมการแจ้งเตือนและประวัติความเคลื่อนไหว</h2>
+    <div class="text-muted small">ติดตามแจ้งเตือนอะไหล่ใกล้หมด รายการค้างชำระ และความเคลื่อนไหวงานซ่อมล่าสุด</div>
+  </div>
+</div>
+
+<div class="row g-4 mb-4">
+  <div class="col-lg-6">
+    <div class="glass-card h-100">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="text-warning mb-0"><i class="fa-solid fa-boxes-stacked me-2"></i>แจ้งเตือนอะไหล่ใกล้หมด (ROP Alert)</h5>
+        <a href="/inventory?low_stock=true" class="btn btn-sm btn-outline-warning">จัดการคลัง</a>
+      </div>
+      <% if (!lowStockItems || lowStockItems.length === 0) { %>
+        <div class="text-muted small py-3 text-center">คลังอะไหล่ปกติ ไม่มีรายการที่ต่ำกว่าจุดสั่งซื้อซ้ำ</div>
+      <% } else { %>
+        <div class="d-flex flex-column gap-2">
+          <% lowStockItems.forEach(item => { %>
+            <div class="p-2.5 rounded-3 bg-dark bg-opacity-50 border border-warning border-opacity-25 d-flex justify-content-between align-items-center">
+              <div>
+                <div class="fw-bold text-light"><%= item.part_name %> <span class="text-muted small font-monospace">(<%= item.part_number || '-' %>)</span></div>
+                <div class="small text-muted">จุดสั่งซื้อซ้ำ (ROP): <%= item.min_qty %> ชิ้น</div>
+              </div>
+              <span class="badge bg-danger">คงเหลือ <%= item.stock_qty %> ชิ้น</span>
+            </div>
+          <% }) %>
+        </div>
+      <% } %>
+    </div>
+  </div>
+
+  <div class="col-lg-6">
+    <div class="glass-card h-100">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="text-info mb-0"><i class="fa-solid fa-clock-rotate-left me-2"></i>รายการรอรับชำระ / ผ่อนชำระ</h5>
+        <% if (user && (user.role === 'owner' || user.role === 'receptionist')) { %>
+          <a href="/finances?filter_option=status:pending" class="btn btn-sm btn-outline-info">ดูหน้าการเงิน</a>
+        <% } %>
+      </div>
+      <% if (!pendingFinances || pendingFinances.length === 0) { %>
+        <div class="text-muted small py-3 text-center">ไม่มีรายการค้างชำระในขณะนี้</div>
+      <% } else { %>
+        <div class="d-flex flex-column gap-2">
+          <% pendingFinances.forEach(f => { %>
+            <div class="p-2.5 rounded-3 bg-dark bg-opacity-50 border border-info border-opacity-25 d-flex justify-content-between align-items-center">
+              <div>
+                <div class="fw-bold text-light"><%= f.description %></div>
+                <div class="small text-muted"><%= new Date(f.transaction_date).toLocaleDateString('th-TH') %> • <%= f.status === 'installment' ? 'ผ่อนชำระ' : 'ค้างชำระ' %></div>
+              </div>
+              <span class="fw-bold text-warning font-monospace"><%= parseFloat(f.amount).toLocaleString('th-TH', { minimumFractionDigits: 2 }) %> ฿</span>
+            </div>
+          <% }) %>
+        </div>
+      <% } %>
+    </div>
+  </div>
+</div>
+
+<div class="glass-card">
+  <h5 class="text-light mb-3"><i class="fa-solid fa-list-ul text-success me-2"></i>บันทึกความเคลื่อนไหวงานซ่อมล่าสุด (Repair Activity Logs)</h5>
+  <div class="table-responsive">
+    <table class="table-excel text-light">
+      <thead>
+        <tr>
+          <th style="width: 18%;">วัน-เวลา</th>
+          <th style="width: 14%;">ใบสั่งซ่อม</th>
+          <th style="width: 16%;">ทะเบียนรถ</th>
+          <th>รายละเอียดการดำเนินการ</th>
+          <th style="width: 16%;">ผู้บันทึก</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (!recentLogs || recentLogs.length === 0) { %>
+          <tr>
+            <td colspan="5" class="text-center text-muted py-4">ยังไม่มีประวัติความเคลื่อนไหวในระบบ</td>
+          </tr>
+        <% } else { %>
+          <% recentLogs.forEach(log => { %>
+            <tr>
+              <td class="small text-muted font-monospace"><%= new Date(log.created_at).toLocaleString('th-TH') %></td>
+              <td><a href="/repairs/detail/<%= log.repair_id %>" class="text-info text-decoration-none fw-bold">#<%= log.repair_id %></a></td>
+              <td><span class="badge bg-light text-dark font-monospace"><%= log.license_plate || '-' %></span></td>
+              <td><%= log.notes %></td>
+              <td class="small text-light"><%= log.updated_by_name || '-' %></td>
+            </tr>
+          <% }) %>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<%- include('partials/footer') %>

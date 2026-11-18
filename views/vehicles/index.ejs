@@ -7,7 +7,7 @@
   </button>
 </div>
 
-<!-- Search Bar & Filters -->
+
 <div class="glass-card mb-4 py-3">
   <form action="/vehicles" method="GET" id="vehicleFilterForm" class="row g-3 align-items-end">
     <div class="col-md-9 col-sm-8">
@@ -20,7 +20,7 @@
       </button>
     </div>
     
-    <!-- Multi-Filters Dropdowns Row -->
+    
     <div class="col-12 mt-3">
       <label class="form-label text-muted small mb-2"><i class="fa-solid fa-filter me-1 text-warning"></i> กรองข้อมูลรถ</label>
       <div class="row row-cols-1 row-cols-sm-3 row-cols-md-3 g-2">
@@ -53,7 +53,7 @@
   </form>
 </div>
 
-<!-- Vehicles Table -->
+
 <div class="glass-card" id="vehiclesContainer">
   <div class="table-responsive">
     <table class="table-excel text-light">
@@ -149,7 +149,7 @@
     </table>
   </div>
 
-  <!-- Pagination -->
+  
   <% if (totalPages > 1) { %>
     <nav class="d-flex justify-content-center mt-4">
       <ul class="pagination pagination-sm m-0">
@@ -169,11 +169,9 @@
   <% } %>
 </div>
 
-<!-- ==========================================
-     MODALS
-     ========================================== -->
 
-<!-- Add Vehicle Modal -->
+
+
 <div class="modal fade" id="addVehicleModal" tabindex="-1" aria-labelledby="addVehicleModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-lg">
     <div class="modal-content text-light" style="background: var(--bg-color); border: 1px solid var(--card-border); border-radius: 16px; backdrop-filter: var(--glass-blur);">
@@ -228,7 +226,7 @@
   </div>
 </div>
 
-<!-- Edit Vehicle Modal -->
+
 <div class="modal fade" id="editVehicleModal" tabindex="-1" aria-labelledby="editVehicleModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-lg">
     <div class="modal-content text-light" style="background: var(--bg-color); border: 1px solid var(--card-border); border-radius: 16px; backdrop-filter: var(--glass-blur);">
@@ -283,7 +281,7 @@
   </div>
 </div>
 
-<!-- Scripts for Fetching -->
+
 <script>
   document.addEventListener('DOMContentLoaded', function() {
     

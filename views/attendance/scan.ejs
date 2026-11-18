@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    body {
+      background: radial-gradient(circle at 50% 20%, #1e293b 0%, #0f172a 100%);
+      min-height: 100vh;
+      color: #f8fafc;
+      font-family: 'Prompt', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    .scan-card {
+      background: rgba(30, 41, 59, 0.85);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+    }
+  </style>
+</head>
+<body class="py-4">
+
+  <div class="container" style="max-width: 520px;">
+
+    <div class="text-center mb-4">
+      <div class="d-inline-flex align-items-center justify-content-center bg-primary bg-opacity-25 text-primary rounded-circle mb-2" style="width: 56px; height: 56px;">
+        <i class="fa-solid fa-qrcode fs-3"></i>
+      </div>
+      <h3 class="fw-bold mb-1">ลงเวลาเข้างานประจำวัน</h3>
+      <div class="text-muted small">
+        <i class="fa-solid fa-calendar-day me-1"></i> วันที่ <%= new Date(today).toLocaleDateString('th-TH', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %>
+      </div>
+    </div>
+
+    <div class="scan-card p-4">
+      <div id="checkInFormContainer">
+        <form id="scanCheckInForm">
+          <input type="hidden" name="date" value="<%= today %>">
+          <input type="hidden" name="token" value="<%= token %>">
+
+          <div class="mb-3">
+            <label class="form-label fw-bold text-light small">
+              <i class="fa-solid fa-user-gear text-info me-1"></i> เลือกรหัส / ชื่อช่างผู้ลงเวลา
+            </label>
+            <select class="form-select form-glass text-light py-2" id="selectStaff" required style="font-size: 1rem;">
+              <option value="" disabled selected>-- กรุณาเลือกชื่อของคุณ --</option>
+              <% staffList.forEach(s => {
+                   const alreadyIn = s.attendance && s.attendance.clock_in;
+                   const isMe = currentUser && currentUser.id === s.id;
+              %>
+                <option value="<%= s.id %>" <%= isMe ? 'selected' : '' %> <%= alreadyIn ? 'disabled' : '' %>>
+                  <%= s.fullname %> <%= alreadyIn ? '(✓ ลงเวลาแล้ว)' : '' %> [<%= s.skills || 'ช่าง' %>]
+                </option>
+              <% }) %>
+            </select>
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label text-muted small">หมายเหตุ (ถ้ามี)</label>
+            <input type="text" class="form-control form-glass text-light" id="inputNotes" placeholder="เช่น นำเครื่องมือมาเพิ่ม หรือเริ่มงานทันที">
+          </div>
+
+          <div id="statusAlert" class="alert d-none mb-3 py-2 px-3 small"></div>
+
+          <button type="submit" id="btnSubmitCheckIn" class="btn btn-primary w-100 py-3 fw-bold rounded-pill shadow-lg d-flex align-items-center justify-content-center gap-2">
+            <i class="fa-solid fa-fingerprint fs-5"></i> ยืนยันการเข้างานทันที
+          </button>
+        </form>
+      </div>
+
+      <div id="successResultContainer" class="text-center py-3 d-none">
+        <div class="d-inline-flex align-items-center justify-content-center bg-success bg-opacity-25 text-success rounded-circle mb-3" style="width: 72px; height: 72px;">
+          <i class="fa-solid fa-calendar-check fs-2"></i>
+        </div>
+        <h4 class="fw-bold text-success mb-1" id="successTitle">เช็คชื่อเข้างานสำเร็จ!</h4>
+        <div class="text-xs text-muted mb-3" id="successDateBadge"></div>
+
+        <div class="bg-dark bg-opacity-50 p-3 rounded-4 border border-secondary border-opacity-25 text-start mb-4">
+          <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom border-secondary border-opacity-25">
+            <span class="text-muted small">ชื่อช่าง / พนักงาน:</span>
+            <span class="fw-bold text-light" id="resStaffName">-</span>
+          </div>
+          <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom border-secondary border-opacity-25">
+            <span class="text-muted small">วันที่ปฏิบัติงาน:</span>
+            <span class="fw-bold text-info" id="resWorkDate">-</span>
+          </div>
+          <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom border-secondary border-opacity-25">
+            <span class="text-muted small">เวลาที่สแกนเข้างาน:</span>
+            <span class="fw-bold font-monospace text-light fs-5" id="resClockInTime">-</span>
+          </div>
+          <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom border-secondary border-opacity-25">
+            <span class="text-muted small">สถานะการมาทำงาน:</span>
+            <span id="resStatusBadge"></span>
+          </div>
+          <div class="d-flex justify-content-between align-items-center">
+            <span class="text-muted small"><i class="fa-solid fa-chart-line text-warning me-1"></i> มาทำงานเดือนนี้แล้ว:</span>
+            <span class="badge bg-primary bg-opacity-25 text-primary border border-primary px-3 py-1 font-monospace fw-bold fs-6" id="resMonthCount">- วัน</span>
+          </div>
+        </div>
+
+        <a href="/" class="btn btn-outline-light rounded-pill px-4">
+          <i class="fa-solid fa-house me-1"></i> กลับสู่หน้าหลัก
+        </a>
+      </div>
+    </div>
+
+    <div class="text-center text-muted text-xs mt-3">
+      <i class="fa-solid fa-shield-halved text-success me-1"></i> รหัส QR Code นี้สร้างจากเซิร์ฟเวอร์อู่แบบไดนามิก เปลี่ยนรหัสใหม่ทุก 1 นาทีเพื่อความปลอดภัย
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('scanCheckInForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const userId = document.getElementById('selectStaff').value;
+      const notes = document.getElementById('inputNotes').value;
+      const token = '<%= token %>';
+      const btn = document.getElementById('btnSubmitCheckIn');
+      const alertBox = document.getElementById('statusAlert');
+
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-2"></i> กำลังบันทึกข้อมูล...';
+      alertBox.className = 'alert d-none';
+
+      fetch('/attendance/scan', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          user_id: userId,
+          token: token,
+          notes: notes
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-fingerprint fs-5"></i> ยืนยันการเข้างานทันที';
+
+        if (data.success) {
+          document.getElementById('checkInFormContainer').classList.add('d-none');
+          document.getElementById('successResultContainer').classList.remove('d-none');
+
+          document.getElementById('resStaffName').textContent = data.staffName;
+          document.getElementById('resWorkDate').textContent = data.thaiFormattedDate;
+          document.getElementById('resClockInTime').textContent = data.clockInTime + ' น.';
+          document.getElementById('resMonthCount').textContent = data.totalDaysThisMonth + ' วัน';
+
+          if (data.status === 'late') {
+            document.getElementById('resStatusBadge').innerHTML = '<span class="badge bg-warning text-dark px-2 py-1"><i class="fa-solid fa-triangle-exclamation me-1"></i>มาสาย</span>';
+          } else {
+            document.getElementById('resStatusBadge').innerHTML = '<span class="badge bg-success text-white px-2 py-1"><i class="fa-solid fa-check me-1"></i>มาทำงาน (ตรงเวลา)</span>';
+          }
+        } else {
+          alertBox.className = 'alert alert-danger py-2 px-3 small';
+          alertBox.textContent = data.message;
+        }
+      })
+      .catch(err => {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-fingerprint fs-5"></i> ยืนยันการเข้างานทันที';
+        alertBox.className = 'alert alert-danger py-2 px-3 small';
+        alertBox.textContent = 'เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์';
+      });
+    });
+  </script>
+</body>
+</html>

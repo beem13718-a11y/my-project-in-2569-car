@@ -1,14 +1,19 @@
 <%- include('../partials/header') %>
 
-<!-- Page Title -->
 <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
   <div>
     <h2 class="page-title mb-1"><i class="fa-solid fa-clipboard-user me-2 text-primary"></i>ระบบเช็คชื่อ & บันทึกเวลาปฏิบัติงานลูกจ้าง</h2>
     <div class="text-muted small">ดึงรายชื่อช่างที่มีในร้านโดยตรง เลือกระบุเวลาเข้า-ออกงาน บันทึกการลา และแก้ไขข้อมูลได้สะดวก</div>
   </div>
+  <% if (isOwner) { %>
+    <div>
+      <a href="/attendance/qr-kiosk" target="_blank" class="btn btn-warning text-dark fw-bold rounded-pill px-4 shadow-sm">
+        <i class="fa-solid fa-qrcode me-2"></i> เปิดหน้าจอ QR สแกนเข้างานประจำวัน
+      </a>
+    </div>
+  <% } %>
 </div>
 
-<!-- Summary Metric Cards (ลูกจ้างเท่านั้น) -->
 <div class="row g-3 mb-4">
   <div class="col-6 col-lg-2 col-md-4">
     <div class="glass-card p-3 h-100 text-center border-bottom border-primary border-3">
@@ -59,7 +64,6 @@
   </div>
 </div>
 
-<!-- Filter Bar (Date Selector) -->
 <div class="glass-card mb-4 py-3">
   <form action="/attendance" method="GET" class="row g-3 align-items-center">
     <div class="col-md-4 col-sm-6">
@@ -87,7 +91,6 @@
   </form>
 </div>
 
-<!-- Past Date Lock Notification & Action Buttons (Unlock / Cancel) -->
 <% if (isPastDate) { %>
   <div class="alert alert-warning py-2 px-3 d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2 border-0" style="background: rgba(255, 193, 7, 0.12); border-left: 4px solid #ffc107 !important; border-radius: 8px;">
     <div class="text-warning small">
@@ -99,7 +102,7 @@
           <i class="fa-solid fa-unlock-keyhole me-1"></i> ปลดล็อกเพื่อแก้ไขข้อมูลย้อนหลัง (เจ้าของร้าน)
         </button>
       <% } %>
-      <!-- Cancel / Back Button placed on the same row -->
+
       <a href="/attendance" class="btn btn-danger btn-sm text-white fw-bold shadow-sm px-3" style="background-color: #dc3545 !important; border-color: #dc3545 !important;">
         <i class="fa-solid fa-xmark me-1"></i> ยกเลิก
       </a>
@@ -129,7 +132,6 @@
   }
 </style>
 
-<!-- Staff Attendance Table -->
 <div class="glass-card mb-4">
   <div class="d-flex justify-content-between align-items-center mb-3">
     <h5 class="text-light mb-0"><i class="fa-solid fa-users-gear me-2 text-info"></i>รายชื่อลูกจ้าง & ช่างซ่อม (<%= selectedDate %>)</h5>
@@ -163,7 +165,7 @@
             <td colspan="7" class="text-center text-muted py-4">ไม่พบรายชื่อลูกจ้างหรือช่างในระบบ</td>
           </tr>
         <% } else { %>
-          <% staffStatusList.forEach((s, idx) => { 
+          <% staffStatusList.forEach((s, idx) => {
                const clockInVal = s.attendance && s.attendance.clock_in ? new Date(s.attendance.clock_in).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) : '08:30';
                const clockOutVal = s.attendance && s.attendance.clock_out ? new Date(s.attendance.clock_out).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) : '17:30';
                const notesVal = s.attendance && s.attendance.notes ? s.attendance.notes : '';
@@ -175,15 +177,14 @@
                 <div class="fw-bold text-light"><%= s.fullname %></div>
                 <div class="text-muted small font-monospace"><%= s.phone || '-' %> • [<%= s.skills || 'ช่างทั่วไป' %>]</div>
               </td>
-              
-              <!-- Clock In Column (High Contrast Icons) -->
+
               <td class="text-center">
                 <% if (isOwner) { %>
                   <div class="input-group input-group-sm time-input-group">
                     <span class="input-group-text bg-success bg-opacity-25 text-success border border-success border-opacity-50">
                       <i class="fa-solid fa-right-to-bracket"></i>
                     </span>
-                    <input type="time" class="form-control form-glass text-center text-light row-clock-in fw-bold" 
+                    <input type="time" class="form-control form-glass text-center text-light row-clock-in fw-bold"
                            value="<%= clockInVal %>"
                            <%= isPastDate ? 'disabled' : '' %>
                            style="font-size: 0.95rem; letter-spacing: 0.5px;">
@@ -195,14 +196,13 @@
                 <% } %>
               </td>
 
-              <!-- Clock Out Column (High Contrast Icons) -->
               <td class="text-center">
                 <% if (isOwner) { %>
                   <div class="input-group input-group-sm time-input-group">
                     <span class="input-group-text bg-info bg-opacity-25 text-info border border-info border-opacity-50">
                       <i class="fa-solid fa-right-from-bracket"></i>
                     </span>
-                    <input type="time" class="form-control form-glass text-center text-light row-clock-out fw-bold" 
+                    <input type="time" class="form-control form-glass text-center text-light row-clock-out fw-bold"
                            value="<%= clockOutVal %>"
                            <%= isPastDate ? 'disabled' : '' %>
                            style="font-size: 0.95rem; letter-spacing: 0.5px;">
@@ -214,7 +214,6 @@
                 <% } %>
               </td>
 
-              <!-- Status Dropdown Column (High Contrast Icons) -->
               <td class="text-center">
                 <% if (isOwner) { %>
                   <div class="input-group input-group-sm time-input-group">
@@ -249,11 +248,10 @@
                 <% } %>
               </td>
 
-              <!-- Notes Column -->
               <td>
                 <% if (isOwner) { %>
-                  <input type="text" class="form-control form-control-sm form-glass text-light row-notes" 
-                         value="<%= notesVal %>" 
+                  <input type="text" class="form-control form-control-sm form-glass text-light row-notes"
+                         value="<%= notesVal %>"
                          placeholder="หมายเหตุ / เหตุผล..."
                          <%= isPastDate ? 'disabled' : '' %>>
                 <% } else { %>
@@ -261,7 +259,6 @@
                 <% } %>
               </td>
 
-              <!-- Action Column: Save Button -->
               <% if (isOwner) { %>
                 <td class="text-center">
                   <button type="button" class="btn btn-glass-primary btn-sm btn-save-row px-3" data-user-id="<%= s.id %>" <%= isPastDate ? 'disabled' : '' %> title="บันทึกข้อมูลแถวนี้">
@@ -277,7 +274,6 @@
   </div>
 </div>
 
-<!-- Owner Password Unlock Modal -->
 <% if (isOwner && isPastDate) { %>
   <div class="modal fade" id="unlockPasswordModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-sm">
@@ -316,7 +312,6 @@
     const selectedDate = '<%= selectedDate %>';
     const isPastDate = <%= isPastDate %>;
 
-    // 3. Password Protected Unlock Past Date
     const unlockModalEl = document.getElementById('unlockPasswordModal');
     let unlockModal = null;
     if (unlockModalEl) {
@@ -357,7 +352,6 @@
           if (data.success) {
             unlockModal.hide();
 
-            // Enable all table inputs
             document.querySelectorAll('.row-clock-in, .row-clock-out, .row-status, .row-notes, .btn-save-row').forEach(el => {
               el.disabled = false;
             });
@@ -395,7 +389,6 @@
       });
     }
 
-    // 4. Quick Row Save from Table
     document.querySelectorAll('.btn-save-row').forEach(btn => {
       btn.addEventListener('click', function() {
         const userId = this.getAttribute('data-user-id');

@@ -1,7 +1,7 @@
 const bcrypt = require('bcryptjs');
 const db = require('../config/db');
 
-// Helper to log audit actions in system
+
 const logAuditAction = async (userId, action, details) => {
   try {
     const sql = 'INSERT INTO audit_logs (user_id, action, details) VALUES (?, ?, ?)';
@@ -11,13 +11,13 @@ const logAuditAction = async (userId, action, details) => {
   }
 };
 
-// Render Settings & System Management screen
+
 const getSettings = async (req, res) => {
   try {
-    // 1. Fetch staff users (excluding password)
+
     const [staff] = await db.query('SELECT id, username, fullname, role, phone, status, created_at FROM users ORDER BY role ASC, fullname ASC');
 
-    // 2. Fetch recent 20 audit logs
+
     const [logs] = await db.query(`
       SELECT al.*, u.fullname AS user_fullname 
       FROM audit_logs al
@@ -25,7 +25,7 @@ const getSettings = async (req, res) => {
       ORDER BY al.created_at DESC LIMIT 20
     `);
 
-    // 3. Fetch system settings
+
     const [settingsRows] = await db.query('SELECT * FROM settings');
     const settingsMap = {};
     settingsRows.forEach(s => settingsMap[s.key] = s.value);
@@ -43,7 +43,7 @@ const getSettings = async (req, res) => {
   }
 };
 
-// Update user password (Admin/Owner action)
+
 const updatePassword = async (req, res) => {
   const { staff_id, new_password } = req.body;
 
@@ -66,7 +66,7 @@ const updatePassword = async (req, res) => {
   }
 };
 
-// Backup MySQL database to an SQL dump file download
+
 const backupDatabase = async (req, res) => {
   try {
     let sqlDump = `-- BT Auto GarageFlow Database Backup\n`;
@@ -80,13 +80,13 @@ const backupDatabase = async (req, res) => {
       sqlDump += `-- Table structure for table \`${table}\`\n`;
       sqlDump += `-- --------------------------------------------------------\n`;
       
-      // Get Create Table DDL
+
       const [[createTableResult]] = await db.query(`SHOW CREATE TABLE \`${table}\``);
       const createDDL = createTableResult['Create Table'];
       sqlDump += `DROP TABLE IF EXISTS \`${table}\`;\n`;
       sqlDump += `${createDDL};\n\n`;
 
-      // Get Table Rows Data
+
       const [rows] = await db.query(`SELECT * FROM \`${table}\``);
       if (rows.length > 0) {
         sqlDump += `-- Dumping data for table \`${table}\`\n`;
@@ -107,7 +107,7 @@ const backupDatabase = async (req, res) => {
 
     sqlDump += `SET FOREIGN_KEY_CHECKS=1;\n`;
 
-    // Trigger download
+
     const filename = `backup-garageflow-${new Date().toISOString().split('T')[0]}.sql`;
     res.setHeader('Content-disposition', `attachment; filename=${filename}`);
     res.setHeader('Content-type', 'text/plain');
@@ -122,7 +122,7 @@ const backupDatabase = async (req, res) => {
   }
 };
 
-// Restore MySQL database from uploaded SQL file contents
+
 const restoreDatabase = async (req, res) => {
   const { sql_content } = req.body;
 
@@ -130,9 +130,9 @@ const restoreDatabase = async (req, res) => {
     return res.status(400).json({ success: false, message: 'ไม่พบเนื้อหาไฟล์ SQL สำหรับกู้คืน' });
   }
 
-  // Splitting statements. Let's make sure it handles multiline correctly.
+
   const statements = sql_content
-    .split(/;(?=(?:[^']*'[^']*')*[^']*$)/g) // split by semicolon outside quotes
+    .split(/;(?=(?:[^']*'[^']*')*[^']*$)/g)
     .map(stmt => stmt.trim())
     .filter(stmt => stmt.length > 0);
 
@@ -141,7 +141,7 @@ const restoreDatabase = async (req, res) => {
     await conn.beginTransaction();
 
     for (const statement of statements) {
-      // Remove comments
+
       const cleaned = statement
         .split('\n')
         .filter(line => !line.trim().startsWith('--') && !line.trim().startsWith('#'))
@@ -155,7 +155,7 @@ const restoreDatabase = async (req, res) => {
 
     await conn.commit();
     
-    // Log the restore action
+
     await logAuditAction(req.session.user.id, 'restore_db', 'กู้คืนฐานข้อมูลจากไฟล์สำรองสำเร็จ');
 
     res.json({ success: true, message: 'กู้คืนฐานข้อมูล (Restore Database) สำเร็จเรียบร้อยแล้ว!' });
@@ -168,7 +168,7 @@ const restoreDatabase = async (req, res) => {
   }
 };
 
-// Update LINE configurations in settings table
+
 const updateLineSettings = async (req, res) => {
   const { line_channel_token, line_channel_secret, line_admin_id, line_notify_token } = req.body;
   
@@ -187,7 +187,7 @@ const updateLineSettings = async (req, res) => {
   }
 };
 
-// Update PromptPay and Payment configurations in settings table
+
 const updatePaymentSettings = async (req, res) => {
   const { promptpay_number, promptpay_name, bank_name, bank_account_no, bank_account_name } = req.body;
   
@@ -207,7 +207,7 @@ const updatePaymentSettings = async (req, res) => {
   }
 };
 
-// Test Sending LINE Notification
+
 const testLineNotification = async (req, res) => {
   const notificationService = require('../services/notificationService');
   const { target_id } = req.body;
@@ -262,7 +262,7 @@ const testLineNotification = async (req, res) => {
   }
 };
 
-// LINE Reply Message Helper
+
 const replyLineMessage = async (replyToken, messages) => {
   try {
     const [[tokenSetting]] = await db.query("SELECT value FROM settings WHERE `key` = 'line_channel_token'");
@@ -290,7 +290,7 @@ const replyLineMessage = async (replyToken, messages) => {
   }
 };
 
-// Public LINE OA Webhook Endpoint (Smart Role-Based 1-on-1 Chatbot)
+
 const lineWebhook = async (req, res) => {
   res.sendStatus(200);
 
@@ -303,7 +303,7 @@ const lineWebhook = async (req, res) => {
 
     if (!replyToken || !userId) continue;
 
-    // 1. Determine User Role (Admin / Owner vs Customer vs Guest)
+
     let userRole = 'guest';
     let userProfile = null;
 
@@ -314,7 +314,7 @@ const lineWebhook = async (req, res) => {
       if (adminId && adminId.trim() === userId) {
         userRole = 'owner';
       } else {
-        // Check if user is registered as customer
+
         const [[customer]] = await db.query('SELECT * FROM customers WHERE line_id = ?', [userId]);
         if (customer) {
           userRole = 'customer';
@@ -325,7 +325,7 @@ const lineWebhook = async (req, res) => {
       console.error('[LINE User Identity Check Error]', err);
     }
 
-    // 2. Follow Event (User adds LINE OA)
+
     if (event.type === 'follow') {
       if (userRole === 'owner') {
         const welcomeOwner = `👑 สวัสดีครับคุณเจ้าของอู่ (ระบบตรวจพบว่าเป็นผู้ดูแลระบบ)!\n\nท่านสามารถสั่งการและดูข้อมูลอู่ได้ทันทีครับ:\n1️⃣ พิมพ์ "สรุป" - ดูภาพรวมงานซ่อมและรายรับ\n2️⃣ พิมพ์ "รถในอู่" - รายชื่อรถที่กำลังซ่อม\n3️⃣ พิมพ์ "อะไหล่" - เช็คสต็อกอะไหล่ใกล้หมด\n4️⃣ พิมพ์ "ทะเบียนรถ" - ดูใบซ่อมเชิงลึก`;
@@ -340,15 +340,13 @@ const lineWebhook = async (req, res) => {
       continue;
     }
 
-    // 3. Text Message Event
+
     if (event.type === 'message' && event.message && event.message.type === 'text') {
       const rawText = event.message.text.trim();
       const lowerText = rawText.toLowerCase();
       const cleanPhone = rawText.replace(/[-\s]/g, '');
 
-      // ==========================================
-      // A. OWNER / ADMIN MODE 👑
-      // ==========================================
+
       if (userRole === 'owner') {
         if (lowerText === 'สรุป' || lowerText === 'ยอด' || lowerText === 'dashboard' || lowerText === '1') {
           try {
@@ -408,7 +406,47 @@ const lineWebhook = async (req, res) => {
             await replyLineMessage(replyToken, 'เกิดข้อผิดพลาดในการดึงสต็อก: ' + err.message);
           }
         }
-        // Check Attendance Command for Owner
+
+        else if (lowerText === 'การเงิน' || lowerText === 'กำไร' || lowerText === 'สรุปยอดวันนี้' || lowerText === 'finance' || lowerText === '6') {
+          try {
+            const [[todayIncome]] = await db.query("SELECT COALESCE(SUM(amount), 0) AS total FROM finances WHERE type = 'income' AND status = 'paid' AND DATE(transaction_date) = CURRENT_DATE()");
+            const [[todayExpense]] = await db.query("SELECT COALESCE(SUM(amount), 0) AS total FROM finances WHERE type = 'expense' AND DATE(transaction_date) = CURRENT_DATE()");
+            const [[monthIncome]] = await db.query("SELECT COALESCE(SUM(amount), 0) AS total FROM finances WHERE type = 'income' AND status = 'paid' AND DATE_FORMAT(transaction_date, '%Y-%m') = DATE_FORMAT(CURRENT_DATE(), '%Y-%m')");
+            const [[monthExpense]] = await db.query("SELECT COALESCE(SUM(amount), 0) AS total FROM finances WHERE type = 'expense' AND DATE_FORMAT(transaction_date, '%Y-%m') = DATE_FORMAT(CURRENT_DATE(), '%Y-%m')");
+            const [[pendingSum]] = await db.query("SELECT COUNT(*) AS cnt, COALESCE(SUM(amount), 0) AS total FROM finances WHERE type = 'income' AND status IN ('pending', 'installment')");
+
+            const tInc = parseFloat(todayIncome.total || 0);
+            const tExp = parseFloat(todayExpense.total || 0);
+            const mInc = parseFloat(monthIncome.total || 0);
+            const mExp = parseFloat(monthExpense.total || 0);
+            const mProfit = mInc - mExp;
+            const pendAmt = parseFloat(pendingSum.total || 0);
+
+            const finMsg = `💵 [สรุปการเงินอู่ - อัปเดตเรียลไทม์]\n\n📅 วันนี้:\n• รายรับ: +${tInc.toLocaleString()} บาท\n• รายจ่าย: -${tExp.toLocaleString()} บาท\n• คงเหลือสุทธิ: ${(tInc - tExp).toLocaleString()} บาท\n\n📆 ประจำเดือนนี้:\n• รายรับรวม: +${mInc.toLocaleString()} บาท\n• รายจ่ายรวม: -${mExp.toLocaleString()} บาท\n• กำไรสุทธิ: ${mProfit.toLocaleString()} บาท\n\n⏳ ยอดค้างชำระ/ผ่อน: ${pendAmt.toLocaleString()} บาท (${pendingSum.cnt} รายการ)\n\n💡 จดรายจ่ายด่วนพิมพ์:\n"จ่าย [รายการ] [จำนวนเงิน]" (เช่น: จ่าย ค่าอะไหล่ 850)`;
+            await replyLineMessage(replyToken, finMsg);
+          } catch (err) {
+            await replyLineMessage(replyToken, 'เกิดข้อผิดพลาดในการดึงข้อมูลการเงิน: ' + err.message);
+          }
+        }
+
+        else if (/^(?:จ่าย|รายจ่าย)\s+(.+?)\s+(\d+(?:\.\d+)?)$/.test(rawText)) {
+          try {
+            const match = rawText.match(/^(?:จ่าย|รายจ่าย)\s+(.+?)\s+(\d+(?:\.\d+)?)$/);
+            const expDesc = match[1].trim();
+            const expAmt = parseFloat(match[2]);
+            const today = new Date().toISOString().split('T')[0];
+
+            await db.query(
+              "INSERT INTO finances (type, amount, payment_method, status, description, transaction_date) VALUES ('expense', ?, 'cash', 'paid', ?, ?)",
+              [expAmt, `[LINE] ${expDesc}`, today]
+            );
+
+            await replyLineMessage(replyToken, `✅ บันทึกรายจ่ายสำเร็จ!\n\n📝 รายการ: ${expDesc}\n💸 จำนวน: ${expAmt.toLocaleString()} บาท\n📅 วันที่: ${today}\n\nระบบได้นำไปหักในบัญชีการเงินเรียบร้อยครับ`);
+          } catch (err) {
+            await replyLineMessage(replyToken, 'เกิดข้อผิดพลาดในการบันทึกรายจ่าย: ' + err.message);
+          }
+        }
+
         else if (lowerText === 'เช็คชื่อ' || lowerText === 'พนักงาน' || lowerText === 'ลูกจ้าง' || lowerText === '4') {
           try {
             const today = new Date().toISOString().split('T')[0];
@@ -445,7 +483,7 @@ const lineWebhook = async (req, res) => {
             await replyLineMessage(replyToken, 'เกิดข้อผิดพลาดในการดึงข้อมูลเช็คชื่อ: ' + err.message);
           }
         }
-        // Wage & Salary Summary Command for Owner
+
         else if (lowerText === 'ค่าจ้าง' || lowerText === 'เงินเดือน' || lowerText === 'payroll' || lowerText === '5') {
           try {
             const currentMonth = new Date().toISOString().slice(0, 7);
@@ -495,7 +533,7 @@ const lineWebhook = async (req, res) => {
             await replyLineMessage(replyToken, 'เกิดข้อผิดพลาดในการคำนวณค่าจ้าง: ' + err.message);
           }
         }
-        // Direct Action: เช็คชื่อ [ชื่อช่าง] [สถานะ/เวลา]
+
         else if (rawText.startsWith('เช็คชื่อ ') || rawText.startsWith('เช็ค ')) {
           try {
             const parts = rawText.split(/\s+/);
@@ -578,9 +616,7 @@ const lineWebhook = async (req, res) => {
         }
       }
 
-      // ==========================================
-      // B. REGISTERED CUSTOMER MODE 🚗
-      // ==========================================
+
       else if (userRole === 'customer') {
         if (lowerText === 'สถานะ' || lowerText === 'รถของฉัน' || lowerText === '1') {
           try {
@@ -686,11 +722,9 @@ const lineWebhook = async (req, res) => {
         }
       }
 
-      // ==========================================
-      // C. GUEST / UNLINKED USER MODE 📱
-      // ==========================================
+
       else {
-        // Match phone number to link customer
+
         if (/^0\d{8,9}$/.test(cleanPhone)) {
           try {
             const [[customer]] = await db.query('SELECT * FROM customers WHERE REPLACE(REPLACE(phone, "-", ""), " ", "") = ?', [cleanPhone]);
@@ -706,7 +740,7 @@ const lineWebhook = async (req, res) => {
             console.error('[LINE Webhook DB Error]', err);
           }
         }
-        // General query (Contact / Hours / Location)
+
         else if (lowerText.includes('ติดต่อ') || lowerText.includes('แผนที่') || lowerText.includes('เวลา') || lowerText.includes('เบอร์')) {
           const contactMsg = `📍 [ข้อมูลการติดต่ออู่ BT Auto Garage]\n\n• เวลาทำการ: จันทร์ - เสาร์ (08:30 - 17:30 น.)\n• เบอร์โทรศัพท์: 081-234-5678\n• ที่อยู่: อู่ซ่อมรถยนต์ BT Auto ถ.พัฒนาการ กทม.\n\nยินดีให้บริการเสมอครับ 😊`;
           await replyLineMessage(replyToken, contactMsg);
@@ -731,7 +765,7 @@ const lineWebhook = async (req, res) => {
           const adminNotice = `🔒 [โหมดเจ้าของร้าน & แอดมิน]\n\n• บัญชี LINE User ID ของคุณคือ:\n👉 ${userId}\n\n*(หากคุณคือเจ้าของร้าน นำรหัสนี้ไปบันทึกในหน้า "ตั้งค่าระบบ" บนเว็บ เพื่อเปิดใช้งานโหมดสั่งงานแอดมิน)*`;
           await replyLineMessage(replyToken, adminNotice);
         }
-        // Match license plate
+
         else {
           try {
             const [repairs] = await db.query(`

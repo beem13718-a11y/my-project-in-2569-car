@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>อู่สมาร์ทการาจ (SmartGarage) | ศูนย์ซ่อมบำรุงรถยนต์ครบวงจร</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Prompt', 'Segoe UI', Tahoma, sans-serif;
+    }
+    html {
+      scroll-behavior: smooth;
+    }
+    body {
+      margin: 0;
+      background-color: #0b0f17;
+      color: #f1f5f9;
+    }
+    .garage-taskbar {
+      position: sticky;
+      top: 0;
+      z-index: 1050;
+      background: rgba(11, 15, 23, 0.92);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid rgba(56, 189, 248, 0.22);
+      padding: 12px 0;
+    }
+    .taskbar-container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .brand-link {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+    }
+    .brand-crest {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: #111827;
+      border: 1.5px solid #38bdf8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 14px rgba(56, 189, 248, 0.25);
+    }
+    .brand-name-th {
+      font-size: 1.18rem;
+      font-weight: 800;
+      color: #f8fafc;
+      line-height: 1.15;
+    }
+    .brand-name-sub {
+      font-size: 0.72rem;
+      color: #38bdf8;
+      font-weight: 600;
+      letter-spacing: 0.4px;
+    }
+    .taskbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-task-track {
+      background: #10b981;
+      color: #ffffff;
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 700;
+      padding: 8px 16px;
+      border-radius: 10px;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      transition: all 0.15s ease;
+    }
+    .btn-task-track:hover {
+      background: #059669;
+      color: #ffffff;
+    }
+    .btn-task-login {
+      background: #2563eb;
+      color: #ffffff;
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 700;
+      padding: 8px 16px;
+      border-radius: 10px;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      transition: all 0.15s ease;
+    }
+    .btn-task-login:hover {
+      background: #1d4ed8;
+      color: #ffffff;
+    }
+    .taskbar-nav {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .taskbar-link {
+      color: #cbd5e1;
+      text-decoration: none;
+      font-size: 0.92rem;
+      font-weight: 500;
+      padding: 7px 13px;
+      border-radius: 8px;
+      transition: all 0.15s ease;
+    }
+    .taskbar-link:hover {
+      background: rgba(255, 255, 255, 0.06);
+      color: #38bdf8;
+    }
+
+    .hero-section {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 44px 20px 56px 20px;
+      display: grid;
+      grid-template-columns: 1.05fr 1fr;
+      gap: 40px;
+      align-items: center;
+    }
+    @media (max-width: 992px) {
+      .hero-section {
+        grid-template-columns: 1fr;
+      }
+    }
+    .hero-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(56, 189, 248, 0.1);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      color: #38bdf8;
+      font-size: 0.85rem;
+      font-weight: 600;
+      padding: 5px 14px;
+      border-radius: 20px;
+      margin-bottom: 16px;
+    }
+    .hero-title {
+      font-size: 2.3rem;
+      font-weight: 800;
+      color: #ffffff;
+      line-height: 1.25;
+      margin-bottom: 14px;
+    }
+    .hero-title span {
+      color: #38bdf8;
+    }
+    .hero-sub {
+      font-size: 1rem;
+      color: #94a3b8;
+      line-height: 1.65;
+      margin-bottom: 26px;
+    }
+    .hero-search-bar {
+      background: #131b2e;
+      border: 1px solid #26324d;
+      border-radius: 14px;
+      padding: 8px;
+      display: flex;
+      gap: 8px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+    }
+    .hero-search-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: #ffffff;
+      padding: 10px 14px;
+      font-size: 0.98rem;
+    }
+    .hero-search-input::placeholder {
+      color: #64748b;
+    }
+    .hero-search-input:focus {
+      outline: none;
+    }
+    .hero-search-btn {
+      background: #10b981;
+      color: #ffffff;
+      border: none;
+      border-radius: 10px;
+      padding: 10px 22px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      white-space: nowrap;
+      transition: background 0.15s ease;
+    }
+    .hero-search-btn:hover {
+      background: #059669;
+    }
+    .hero-image-card {
+      position: relative;
+      border-radius: 20px;
+      overflow: hidden;
+      border: 1px solid #1e293b;
+      box-shadow: 0 24px 48px rgba(0, 0, 0, 0.6);
+      background: #111827;
+    }
+    .hero-image-card img {
+      width: 100%;
+      height: 390px;
+      object-fit: cover;
+      display: block;
+    }
+    .hero-image-overlay {
+      position: absolute;
+      bottom: 16px;
+      left: 16px;
+      right: 16px;
+      background: rgba(11, 15, 23, 0.88);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 14px;
+      padding: 14px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .section-wrap {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 52px 20px;
+    }
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 28px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .section-title {
+      font-size: 1.65rem;
+      font-weight: 800;
+      color: #ffffff;
+      margin: 0;
+    }
+    .section-sub {
+      font-size: 0.94rem;
+      color: #94a3b8;
+      margin: 4px 0 0 0;
+    }
+
+    .photo-service-card {
+      background: #111827;
+      border: 1px solid #1e293b;
+      border-radius: 16px;
+      overflow: hidden;
+      height: 100%;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+    .photo-service-card:hover {
+      transform: translateY(-4px);
+      border-color: #38bdf8;
+    }
+    .photo-service-img {
+      width: 100%;
+      height: 185px;
+      object-fit: cover;
+      display: block;
+    }
+    .photo-service-body {
+      padding: 18px 20px;
+    }
+
+    .review-card {
+      background: #111827;
+      border: 1px solid #1e293b;
+      border-radius: 16px;
+      padding: 22px;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .contact-box {
+      background: #111827;
+      border: 1px solid #1e293b;
+      border-radius: 16px;
+      padding: 22px;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .contact-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: rgba(56, 189, 248, 0.12);
+      color: #38bdf8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      flex-shrink: 0;
+    }
+    .dark-input {
+      background: #0b0f17;
+      border: 1px solid #334155;
+      color: #f8fafc;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 0.94rem;
+      width: 100%;
+    }
+    .dark-input:focus {
+      outline: none;
+      border-color: #38bdf8;
+    }
+    .footer-bar {
+      background: #070a10;
+      border-top: 1px solid #1e293b;
+      color: #64748b;
+      padding: 24px 20px;
+      text-align: center;
+      font-size: 0.88rem;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="garage-taskbar">
+    <div class="taskbar-container">
+      <a href="/" class="brand-link">
+        <div class="brand-crest">
+          <svg width="28" height="28" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M14 36L20 22H44L50 36H14Z" stroke="#38BDF8" stroke-width="3" fill="rgba(56,189,248,0.15)"/>
+            <rect x="10" y="35" width="44" height="11" rx="4" fill="#38BDF8"/>
+            <circle cx="20" cy="46" r="5" fill="#090D16" stroke="#E2E8F0" stroke-width="3"/>
+            <circle cx="44" cy="46" r="5" fill="#090D16" stroke="#E2E8F0" stroke-width="3"/>
+            <path d="M8 54H56" stroke="#10B981" stroke-width="3" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div>
+          <div class="brand-name-th">อู่สมาร์ทการาจ (SmartGarage)</div>
+          <div class="brand-name-sub">AUTO REPAIR &amp; SERVICE CENTER</div>
+        </div>
+      </a>
+
+      <div class="taskbar-actions">
+        <a href="/public/track" class="btn-task-track">
+          <i class="fa-solid fa-car-side"></i>
+          <span>เช็กสถานะรถลูกค้า</span>
+        </a>
+        <% if (typeof user !== 'undefined' && user) { %>
+          <a href="/dashboard" class="btn-task-login">
+            <i class="fa-solid fa-gauge-high"></i>
+            <span>จัดการอู่ (<%= user.username %>)</span>
+          </a>
+        <% } else { %>
+          <a href="/auth/login" class="btn-task-login">
+            <i class="fa-solid fa-user-gear"></i>
+            <span>เข้าสู่ระบบพนักงาน</span>
+          </a>
+        <% } %>
+      </div>
+
+      <nav class="taskbar-nav">
+        <a href="#hero" class="taskbar-link">หน้าแรกอู่</a>
+        <a href="#services" class="taskbar-link">งานบริการซ่อม</a>
+        <a href="#reviews" class="taskbar-link">รีวิวจากลูกค้า</a>
+        <a href="#contact" class="taskbar-link">ติดต่ออู่</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero-section" id="hero">
+    <div>
+      <div class="hero-tag">
+        <i class="fa-solid fa-screwdriver-wrench"></i> ศูนย์บริการซ่อมบำรุงรถยนต์ครบวงจร
+      </div>
+      <h1 class="hero-title">
+        ดูแลเครื่องยนต์และช่วงล่าง<br>
+        <span>มาตรฐานมืออาชีพ</span> โปร่งใสทุกขั้นตอน
+      </h1>
+      <p class="hero-sub">
+        ตรวจเช็กอาการด้วยระบบวิเคราะห์รถยนต์ ประเมินราคาก่อนซ่อมทุกคัน พร้อมระบบติดตามสถานะงานซ่อมและดูรูปถ่ายก่อน-หลังซ่อมผ่านหน้าเว็บได้ตลอด 24 ชั่วโมง
+      </p>
+
+      <form action="/public/track" method="GET" class="hero-search-bar">
+        <input type="text" name="plate" class="hero-search-input" placeholder="กรอกเลขทะเบียนรถของคุณ เช่น กก 1234, วว 9999..." required>
+        <button type="submit" class="hero-search-btn">
+          <i class="fa-solid fa-magnifying-glass me-1"></i> เช็กสถานะรถ
+        </button>
+      </form>
+      <div class="d-flex gap-4 mt-3 text-secondary" style="font-size: 0.84rem;">
+        <span><i class="fa-solid fa-check text-success me-1"></i> ตรวจเช็กเบื้องต้นฟรี</span>
+        <span><i class="fa-solid fa-check text-success me-1"></i> อะไหล่แท้ตรงรุ่น</span>
+        <span><i class="fa-solid fa-check text-success me-1"></i> รับประกันงานซ่อม</span>
+      </div>
+    </div>
+
+    <div class="hero-image-card">
+      <img src="/images/hero-garage.svg" alt="SmartGarage Workshop">
+      <div class="hero-image-overlay">
+        <div>
+          <div class="fw-bold text-white" style="font-size: 0.96rem;">
+            <span class="text-success me-1">●</span> เปิดให้บริการ จันทร์ - เสาร์ (08:00 - 18:00 น.)
+          </div>
+          <div class="text-secondary" style="font-size: 0.82rem;">พร้อมช่องซ่อมมาตรฐานและฮอยท์ยกรถ 3 ช่องบริการ</div>
+        </div>
+        <a href="#contact" class="btn btn-sm btn-outline-info fw-bold px-3" style="border-radius: 8px;">
+          <i class="fa-solid fa-phone me-1"></i> 081-234-5678
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-wrap" id="services">
+    <div class="section-head">
+      <div>
+        <h2 class="section-title">งานบริการซ่อมบำรุงหลัก</h2>
+        <p class="section-sub">ดูแลครบทุกจุดสำคัญของรถยนต์ แจ้งราคาก่อนลงมือซ่อมทุกครั้ง</p>
+      </div>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-md-6 col-lg-3">
+        <div class="photo-service-card">
+          <img src="/images/service-oil.svg" class="photo-service-img" alt="เปลี่ยนถ่ายน้ำมันเครื่อง">
+          <div class="photo-service-body">
+            <h5 class="fw-bold text-white mb-1">เช็กระยะ &amp; ของเหลว</h5>
+            <p class="text-secondary small mb-3">เปลี่ยนถ่ายน้ำมันเครื่องสังเคราะห์แท้ ไส้กรอง น้ำมันเกียร์ และตรวจเช็ก 25 จุด</p>
+            <div class="fw-bold text-info small">เริ่มต้น 950 บาท</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-3">
+        <div class="photo-service-card">
+          <img src="/images/service-engine.svg" class="photo-service-img" alt="ซ่อมเครื่องยนต์">
+          <div class="photo-service-body">
+            <h5 class="fw-bold text-white mb-1">เครื่องยนต์ &amp; ระบบไฟ</h5>
+            <p class="text-secondary small mb-3">ซ่อมเครื่องสั่น ความร้อนขึ้น น้ำมันรั่วซึม แบตเตอรี่ และสแกนโค้ดด้วย OBD-II</p>
+            <div class="fw-bold text-success small">ตรวจเช็กอาการฟรี</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-3">
+        <div class="photo-service-card">
+          <img src="/images/service-brake.svg" class="photo-service-img" alt="ระบบเบรกและช่วงล่าง">
+          <div class="photo-service-body">
+            <h5 class="fw-bold text-white mb-1">เบรก &amp; ช่วงล่าง</h5>
+            <p class="text-secondary small mb-3">เปลี่ยนผ้าเบรก เจียรจานเบรก โช้คอัพ ลูกหมาก แก้ปัญหาช่วงล่างมีเสียงดัง</p>
+            <div class="fw-bold text-info small">เริ่มต้น 1,200 บาท</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-3">
+        <div class="photo-service-card">
+          <img src="/images/service-body.svg" class="photo-service-img" alt="แอร์และตัวถัง">
+          <div class="photo-service-body">
+            <h5 class="fw-bold text-white mb-1">แอร์รถยนต์ &amp; สีตัวถัง</h5>
+            <p class="text-secondary small mb-3">ล้างแอร์ เติมน้ำยาแอร์ เปลี่ยนคอมแอร์ และบริการเคาะพ่นสีตัวถังมาตรฐาน</p>
+            <div class="fw-bold text-info small">เริ่มต้น 500 บาท</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-wrap" id="reviews" style="border-top: 1px solid #1e293b;">
+    <div class="section-head">
+      <div>
+        <h2 class="section-title">รีวิวจากลูกค้าผู้ใช้บริการ</h2>
+        <p class="section-sub">คะแนนความพึงพอใจเฉลี่ย <b class="text-info">4.9 / 5.0 ★</b> จากลูกค้าจริง (<%= reviews.length %> รีวิว)</p>
+      </div>
+      <button class="btn btn-outline-info fw-bold px-3 py-2" type="button" data-bs-toggle="collapse" data-bs-target="#writeReviewBox" style="border-radius: 10px; font-size: 0.9rem;">
+        <i class="fa-solid fa-pen me-1"></i> เขียนรีวิวร้าน
+      </button>
+    </div>
+
+    <% if (typeof reviewSuccess !== 'undefined' && reviewSuccess) { %>
+      <div class="alert alert-success bg-success bg-opacity-25 text-light border-success py-2 px-3 mb-4" style="border-radius: 10px; font-size: 0.92rem;">
+        <i class="fa-solid fa-circle-check me-1"></i> บันทึกรีวิวของคุณขึ้นหน้าเว็บไซต์เรียบร้อยแล้ว
+      </div>
+    <% } %>
+
+    <div class="collapse mb-4" id="writeReviewBox">
+      <div class="p-4 rounded-4" style="background: #111827; border: 1px solid #334155;">
+        <form action="/reviews/add" method="POST">
+          <div class="row g-3">
+            <div class="col-md-4">
+              <input type="text" name="name" class="dark-input" placeholder="ชื่อของคุณ (เช่น คุณสมปอง)" required>
+            </div>
+            <div class="col-md-4">
+              <input type="text" name="car" class="dark-input" placeholder="รุ่นรถ / บริการที่ใช้ (เช่น Civic • เช็กระยะ)" required>
+            </div>
+            <div class="col-md-4">
+              <select name="rating" class="dark-input text-info fw-bold">
+                <option value="5">★★★★★ (5 ดาว - ประทับใจมาก)</option>
+                <option value="4">★★★★ (4 ดาว - ดีมาก)</option>
+                <option value="3">★★★ (3 ดาว - ปานกลาง)</option>
+              </select>
+            </div>
+            <div class="col-md-9">
+              <input type="text" name="comment" class="dark-input" placeholder="เขียนความคิดเห็นหรือความประทับใจของคุณ..." required>
+            </div>
+            <div class="col-md-3 d-grid">
+              <button type="submit" class="btn btn-info fw-bold text-dark" style="border-radius: 10px;">ส่งรีวิว</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="row g-4">
+      <% reviews.slice(0, 6).forEach(function(rv) { %>
+        <div class="col-md-6 col-lg-4">
+          <div class="review-card">
+            <div>
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="text-info">
+                  <% for (let i = 0; i < (rv.rating || 5); i++) { %>★<% } %>
+                </span>
+                <span class="badge bg-dark text-secondary border border-secondary" style="font-weight: 500;"><%= rv.car %></span>
+              </div>
+              <p class="mb-3" style="font-size: 0.94rem; color: #cbd5e1; line-height: 1.6;">"<%= rv.comment %>"</p>
+            </div>
+            <div class="d-flex justify-content-between align-items-center pt-2 border-top border-secondary border-opacity-25 text-secondary" style="font-size: 0.82rem;">
+              <span class="fw-bold text-light"><%= rv.name %></span>
+              <span><%= rv.date %></span>
+            </div>
+          </div>
+        </div>
+      <% }); %>
+    </div>
+  </section>
+
+  <section class="section-wrap" id="contact" style="border-top: 1px solid #1e293b;">
+    <div class="section-head">
+      <div>
+        <h2 class="section-title">ข้อมูลติดต่ออู่</h2>
+        <p class="section-sub">สอบถามอาการเสียหรือนัดหมายนำรถเข้าตรวจเช็ก</p>
+      </div>
+    </div>
+
+    <div class="row g-3">
+      <div class="col-md-6 col-lg-3">
+        <div class="contact-box">
+          <div class="contact-icon"><i class="fa-solid fa-phone"></i></div>
+          <div>
+            <div class="text-secondary small">เบอร์โทรศัพท์อู่</div>
+            <div class="fw-bold text-white fs-6">081-234-5678</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-3">
+        <div class="contact-box">
+          <div class="contact-icon" style="color: #34d399; background: rgba(16,185,129,0.12);"><i class="fa-brands fa-line"></i></div>
+          <div>
+            <div class="text-secondary small">LINE Official</div>
+            <div class="fw-bold text-success fs-6">@SmartGarage</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-3">
+        <div class="contact-box">
+          <div class="contact-icon"><i class="fa-solid fa-clock"></i></div>
+          <div>
+            <div class="text-secondary small">เวลาเปิดทำการ</div>
+            <div class="fw-bold text-white fs-6">จ.-ส. 08:00 - 18:00 น.</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-3">
+        <div class="contact-box">
+          <div class="contact-icon"><i class="fa-solid fa-location-dot"></i></div>
+          <div>
+            <div class="text-secondary small">สถานที่ตั้งอู่</div>
+            <div class="fw-bold text-white" style="font-size: 0.9rem;">ถ.พัฒนาการ สวนหลวง กทม.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer-bar">
+    อู่สมาร์ทการาจ (SmartGarage Auto Service) • ระบบบริหารจัดการอู่ซ่อมรถยนต์และติดตามงานซ่อมออนไลน์
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+</body>
+</html>

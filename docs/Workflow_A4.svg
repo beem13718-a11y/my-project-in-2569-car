@@ -1,0 +1,208 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 1160" width="100%" height="100%" style="background-color: #ffffff; font-family: 'Prompt', 'Kanit', 'Segoe UI', Tahoma, sans-serif;">
+  <defs>
+    <!-- Drop Shadows -->
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="115%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#0f172a" flood-opacity="0.08"/>
+    </filter>
+
+    <!-- Arrow Markers -->
+    <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#64748b"/>
+    </marker>
+    <marker id="arrow-green" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#059669"/>
+    </marker>
+    <marker id="arrow-red" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#dc2626"/>
+    </marker>
+
+    <!-- Gradients -->
+    <linearGradient id="start-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2563eb"/>
+      <stop offset="100%" stop-color="#1d4ed8"/>
+    </linearGradient>
+    <linearGradient id="end-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#059669"/>
+      <stop offset="100%" stop-color="#047857"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background Canvas -->
+  <rect width="820" height="1160" fill="#ffffff"/>
+
+  <!-- Border Frame for Academic Cleanliness -->
+  <rect x="15" y="15" width="790" height="1130" rx="12" fill="none" stroke="#e2e8f0" stroke-width="1.5"/>
+
+  <!-- START NODE (Shifted up smoothly after header removal) -->
+  <g transform="translate(260, 50)">
+    <rect width="300" height="38" rx="19" fill="url(#start-grad)" filter="url(#shadow)"/>
+    <text x="150" y="24" text-anchor="middle" fill="#ffffff" font-size="13.5" font-weight="bold">
+      ลูกค้านำรถเข้ามารับบริการ
+    </text>
+  </g>
+
+  <!-- Line from Start to Step 1 -->
+  <line x1="410" y1="88" x2="410" y2="110" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- Step 1: Intake -->
+  <g transform="translate(195, 112)">
+    <rect width="430" height="48" rx="8" fill="#f8fafc" stroke="#3b82f6" stroke-width="1.5" filter="url(#shadow)"/>
+    <rect width="6" height="48" rx="3" fill="#3b82f6"/>
+    <text x="18" y="21" fill="#0f172a" font-size="12" font-weight="bold">1. บันทึกข้อมูลรับรถเข้าอู่ (Vehicle Intake)</text>
+    <text x="18" y="38" fill="#64748b" font-size="10.5">บันทึกข้อมูลลูกค้า, ทะเบียน, ยี่ห้อ, รุ่น, สี และรายละเอียดอาการชำรุด</text>
+  </g>
+
+  <!-- Line to Step 2 -->
+  <line x1="410" y1="160" x2="410" y2="182" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- Step 2: Pre-Inspection Photo -->
+  <g transform="translate(195, 184)">
+    <rect width="430" height="48" rx="8" fill="#f8fafc" stroke="#3b82f6" stroke-width="1.5" filter="url(#shadow)"/>
+    <rect width="6" height="48" rx="3" fill="#3b82f6"/>
+    <text x="18" y="21" fill="#0f172a" font-size="12" font-weight="bold">2. บันทึกภาพถ่ายก่อนซ่อม (Pre-inspection)</text>
+    <text x="18" y="38" fill="#64748b" font-size="10.5">ถ่ายภาพสภาพตัวถังและรอยเสียหายเดิมรอบคัน อัปโหลดเก็บเป็นหลักฐาน</text>
+  </g>
+
+  <!-- Line to Step 3 -->
+  <line x1="410" y1="232" x2="410" y2="254" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- Step 3: Diagnose & Estimate -->
+  <g transform="translate(195, 256)">
+    <rect width="430" height="48" rx="8" fill="#f8fafc" stroke="#f59e0b" stroke-width="1.5" filter="url(#shadow)"/>
+    <rect width="6" height="48" rx="3" fill="#f59e0b"/>
+    <text x="18" y="21" fill="#0f172a" font-size="12" font-weight="bold">3. ตรวจวินิจฉัยและระบุอะไหล่ (Diagnosis &amp; Parts)</text>
+    <text x="18" y="38" fill="#64748b" font-size="10.5">ช่างตรวจเช็คอาการ ระบุรายการอะไหล่ที่ต้องใช้จากคลัง และประเมินค่าแรง</text>
+  </g>
+
+  <!-- Line to Step 4 -->
+  <line x1="410" y1="304" x2="410" y2="326" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- Step 4: Issue Quotation -->
+  <g transform="translate(195, 328)">
+    <rect width="430" height="48" rx="8" fill="#f8fafc" stroke="#f59e0b" stroke-width="1.5" filter="url(#shadow)"/>
+    <rect width="6" height="48" rx="3" fill="#f59e0b"/>
+    <text x="18" y="21" fill="#0f172a" font-size="12" font-weight="bold">4. ออกใบเสนอราคา (Quotation Generation)</text>
+    <text x="18" y="38" fill="#64748b" font-size="10.5">สร้างใบเสนอราคามาตรฐาน A4 และส่งเป็นการ์ดสรุปเข้า LINE ลูกค้า</text>
+  </g>
+
+  <!-- Line to Decision -->
+  <line x1="410" y1="376" x2="410" y2="398" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- Decision: Customer Approval -->
+  <g transform="translate(410, 428)">
+    <polygon points="0,-28 110,0 0,28 -110,0" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.5" filter="url(#shadow)"/>
+    <text x="0" y="-4" text-anchor="middle" fill="#92400e" font-size="11.5" font-weight="bold">ลูกค้าอนุมัติ</text>
+    <text x="0" y="12" text-anchor="middle" fill="#92400e" font-size="11.5" font-weight="bold">การซ่อมหรือไม่?</text>
+  </g>
+
+  <!-- Decision: NO branch -->
+  <line x1="520" y1="428" x2="635" y2="428" stroke="#dc2626" stroke-width="1.8" marker-end="url(#arrow-red)"/>
+  <text x="575" y="420" text-anchor="middle" fill="#dc2626" font-size="10.5" font-weight="bold">ไม่อนุมัติ</text>
+  
+  <g transform="translate(638, 406)">
+    <rect width="138" height="44" rx="6" fill="#fee2e2" stroke="#ef4444" stroke-width="1.2"/>
+    <text x="69" y="19" text-anchor="middle" fill="#991b1b" font-size="11" font-weight="bold">ยกเลิกงานซ่อม</text>
+    <text x="69" y="34" text-anchor="middle" fill="#991b1b" font-size="10">ส่งคืนรถแก่ลูกค้า</text>
+  </g>
+
+  <!-- Decision: YES branch -->
+  <line x1="410" y1="456" x2="410" y2="484" stroke="#059669" stroke-width="1.8" marker-end="url(#arrow-green)"/>
+  <text x="432" y="473" fill="#059669" font-size="11" font-weight="bold">อนุมัติ</text>
+
+  <!-- Step 5: Assign Job -->
+  <g transform="translate(195, 486)">
+    <rect width="430" height="48" rx="8" fill="#f8fafc" stroke="#10b981" stroke-width="1.5" filter="url(#shadow)"/>
+    <rect width="6" height="48" rx="3" fill="#10b981"/>
+    <text x="18" y="21" fill="#0f172a" font-size="12" font-weight="bold">5. มอบหมายงานช่าง (Job Dispatching)</text>
+    <text x="18" y="38" fill="#64748b" font-size="10.5">จ่ายงานให้ช่างผู้รับผิดชอบ และปรับสถานะเป็น 'กำลังซ่อม (Repairing)'</text>
+  </g>
+
+  <!-- Line to Step 6 -->
+  <line x1="410" y1="534" x2="410" y2="556" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- Step 6: Deduct Inventory -->
+  <g transform="translate(195, 558)">
+    <rect width="430" height="48" rx="8" fill="#f8fafc" stroke="#10b981" stroke-width="1.5" filter="url(#shadow)"/>
+    <rect width="6" height="48" rx="3" fill="#10b981"/>
+    <text x="18" y="21" fill="#0f172a" font-size="12" font-weight="bold">6. เบิกอะไหล่และตัดสต็อก (Inventory Deduction)</text>
+    <text x="18" y="38" fill="#64748b" font-size="10.5">ตัดสต็อกอัตโนมัติ Real-Time / แจ้งเตือนเข้า LINE หากของใกล้หมด</text>
+  </g>
+
+  <!-- Line to Step 7 -->
+  <line x1="410" y1="606" x2="410" y2="628" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- Step 7: Repair Execution -->
+  <g transform="translate(195, 630)">
+    <rect width="430" height="48" rx="8" fill="#f8fafc" stroke="#10b981" stroke-width="1.5" filter="url(#shadow)"/>
+    <rect width="6" height="48" rx="3" fill="#10b981"/>
+    <text x="18" y="21" fill="#0f172a" font-size="12" font-weight="bold">7. ปฏิบัติการซ่อมแซม (Repair Execution)</text>
+    <text x="18" y="38" fill="#64748b" font-size="10.5">ช่างดำเนินการซ่อม ลูกค้าสามารถติดตามสถานะผ่านเว็บและ LINE Bot 24 ชม.</text>
+  </g>
+
+  <!-- Line to Step 8 -->
+  <line x1="410" y1="678" x2="410" y2="700" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- Step 8: Post-Inspection -->
+  <g transform="translate(195, 702)">
+    <rect width="430" height="48" rx="8" fill="#f8fafc" stroke="#8b5cf6" stroke-width="1.5" filter="url(#shadow)"/>
+    <rect width="6" height="48" rx="3" fill="#8b5cf6"/>
+    <text x="18" y="21" fill="#0f172a" font-size="12" font-weight="bold">8. ตรวจสอบคุณภาพและถ่ายภาพหลังซ่อม (Post-inspection)</text>
+    <text x="18" y="38" fill="#64748b" font-size="10.5">ตรวจเช็คความเรียบร้อย และถ่ายภาพชิ้นส่วนที่เปลี่ยนหลังซ่อมเสร็จ</text>
+  </g>
+
+  <!-- Line to Step 9 -->
+  <line x1="410" y1="750" x2="410" y2="772" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- Step 9: Close Job & Warranty -->
+  <g transform="translate(195, 774)">
+    <rect width="430" height="48" rx="8" fill="#f8fafc" stroke="#8b5cf6" stroke-width="1.5" filter="url(#shadow)"/>
+    <rect width="6" height="48" rx="3" fill="#8b5cf6"/>
+    <text x="18" y="21" fill="#0f172a" font-size="12" font-weight="bold">9. ปิดงานซ่อมและรับประกัน (Closing &amp; Warranty)</text>
+    <text x="18" y="38" fill="#64748b" font-size="10.5">ปรับสถานะเป็น 'ซ่อมเสร็จพร้อมส่งมอบ' และระบุระยะเวลารับประกัน</text>
+  </g>
+
+  <!-- Line to Step 10 -->
+  <line x1="410" y1="822" x2="410" y2="844" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- Step 10: Notification & Billing -->
+  <g transform="translate(195, 846)">
+    <rect width="430" height="48" rx="8" fill="#f8fafc" stroke="#0284c7" stroke-width="1.5" filter="url(#shadow)"/>
+    <rect width="6" height="48" rx="3" fill="#0284c7"/>
+    <text x="18" y="21" fill="#0f172a" font-size="12" font-weight="bold">10. แจ้งเตือนลูกค้ารับรถและออกบิล (Notification &amp; Billing)</text>
+    <text x="18" y="38" fill="#64748b" font-size="10.5">ส่งการ์ดแจ้งเตือนรถซ่อมเสร็จทาง LINE และออกใบเสร็จ A4 หน้าเดียว</text>
+  </g>
+
+  <!-- Line to Step 11 -->
+  <line x1="410" y1="894" x2="410" y2="916" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- Step 11: PromptPay QR Settlement -->
+  <g transform="translate(195, 918)">
+    <rect width="430" height="48" rx="8" fill="#f8fafc" stroke="#0284c7" stroke-width="1.5" filter="url(#shadow)"/>
+    <rect width="6" height="48" rx="3" fill="#0284c7"/>
+    <text x="18" y="21" fill="#0f172a" font-size="12" font-weight="bold">11. ชำระเงิน Dynamic PromptPay QR (Settlement)</text>
+    <text x="18" y="38" fill="#64748b" font-size="10.5">ลูกค้าสแกน QR Code พร้อมเพย์ตามยอดจริง และเจ้าของอู่ยืนยันการรับเงิน</text>
+  </g>
+
+  <!-- Line to Step 12 -->
+  <line x1="410" y1="966" x2="410" y2="988" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- Step 12: Bookkeeping & Analytics -->
+  <g transform="translate(195, 990)">
+    <rect width="430" height="48" rx="8" fill="#f8fafc" stroke="#0284c7" stroke-width="1.5" filter="url(#shadow)"/>
+    <rect width="6" height="48" rx="3" fill="#0284c7"/>
+    <text x="18" y="21" fill="#0f172a" font-size="12" font-weight="bold">12. บันทึกบัญชีการเงิน (Revenue &amp; Net Profit)</text>
+    <text x="18" y="38" fill="#64748b" font-size="10.5">ระบบบันทึกรายรับเข้าบัญชีการเงิน และอัปเดตผลกำไรสุทธิบนแดชบอร์ด</text>
+  </g>
+
+  <!-- Line to End -->
+  <line x1="410" y1="1038" x2="410" y2="1060" stroke="#64748b" stroke-width="2" marker-end="url(#arrow-green)"/>
+
+  <!-- END NODE (Without word "สิ้นสุด") -->
+  <g transform="translate(245, 1062)">
+    <rect width="330" height="38" rx="19" fill="url(#end-grad)" filter="url(#shadow)"/>
+    <text x="165" y="24" text-anchor="middle" fill="#ffffff" font-size="13" font-weight="bold">
+      ส่งมอบรถคืนลูกค้า พร้อมใบรับประกันงานซ่อม
+    </text>
+  </g>
+
+</svg>

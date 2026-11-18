@@ -1,6 +1,6 @@
 <%- include('partials/header') %>
 
-<!-- Page Title & Greeting -->
+
 <div class="d-flex justify-content-between align-items-center mb-4">
   <div>
     <h2 class="page-title">แผงควบคุมระบบ</h2>
@@ -14,7 +14,7 @@
   </div>
 </div>
 
-<!-- Alert for Low Stock Items -->
+
 <% if (stats.lowStock > 0) { %>
   <div class="alert alert-warning border-0 text-light bg-warning bg-opacity-25 mb-4 d-flex align-items-center justify-content-between" role="alert" style="border-radius: 12px; backdrop-filter: var(--glass-blur);">
     <div>
@@ -27,9 +27,9 @@
   </div>
 <% } %>
 
-<!-- Summary Stats Row -->
+
 <div class="row g-4 mb-4">
-  <!-- Customers Card -->
+  
   <div class="col-xl-3 col-md-6">
     <div class="glass-card stat-card">
       <div>
@@ -42,7 +42,7 @@
     </div>
   </div>
 
-  <!-- Vehicles Card -->
+  
   <div class="col-xl-3 col-md-6">
     <div class="glass-card stat-card">
       <div>
@@ -55,7 +55,7 @@
     </div>
   </div>
 
-  <!-- Active Repair Card -->
+  
   <div class="col-xl-3 col-md-6">
     <div class="glass-card stat-card">
       <div>
@@ -68,44 +68,64 @@
     </div>
   </div>
 
-  <!-- Monthly Income Card -->
-  <div class="col-xl-3 col-md-6">
-    <div class="glass-card stat-card">
-      <div>
-        <div class="text-muted small fw-semibold">รายได้เดือนนี้</div>
-        <div class="stat-number text-success"><%= stats.monthIncome.toLocaleString('th-TH') %> ฿</div>
-      </div>
-      <div class="stat-icon success" style="background: rgba(16, 185, 129, 0.15);">
-        <i class="fa-solid fa-wallet"></i>
+  <% if (user && (user.role === 'owner' || user.role === 'receptionist')) { %>
+    <div class="col-xl-3 col-md-6">
+      <div class="glass-card stat-card">
+        <div>
+          <div class="text-muted small fw-semibold">รายได้เดือนนี้</div>
+          <div class="stat-number text-success"><%= stats.monthIncome.toLocaleString('th-TH') %> ฿</div>
+        </div>
+        <div class="stat-icon success" style="background: rgba(16, 185, 129, 0.15);">
+          <i class="fa-solid fa-wallet"></i>
+        </div>
       </div>
     </div>
-  </div>
+  <% } else { %>
+    <div class="col-xl-3 col-md-6">
+      <div class="glass-card stat-card">
+        <div>
+          <div class="text-muted small fw-semibold">อะไหล่ใกล้หมดสต็อก</div>
+          <div class="stat-number <%= stats.lowStock > 0 ? 'text-danger' : 'text-info' %>"><%= stats.lowStock %> รายการ</div>
+        </div>
+        <div class="stat-icon warning">
+          <i class="fa-solid fa-boxes-stacked"></i>
+        </div>
+      </div>
+    </div>
+  <% } %>
 </div>
 
-<!-- Charts & Status Breakdown Section -->
 <div class="row g-4 mb-4">
-  <!-- Chart 1: Revenue Line Graph -->
-  <div class="col-lg-8">
-    <div class="glass-card" style="height: 395px;">
-      <h5 class="text-light mb-4"><i class="fa-solid fa-money-bill-trend-up me-2 text-success"></i>สถิติรายรับรายเดือน (6 เดือนล่าสุด)</h5>
-      <div style="position: relative; height: 315px; width: 100%;">
-        <canvas id="revenueChart"></canvas>
+  <% if (user && (user.role === 'owner' || user.role === 'receptionist')) { %>
+    <div class="col-lg-8">
+      <div class="glass-card" style="height: 395px;">
+        <h5 class="text-light mb-4"><i class="fa-solid fa-money-bill-trend-up me-2 text-success"></i>สถิติรายรับรายเดือน (6 เดือนล่าสุด)</h5>
+        <div style="position: relative; height: 315px; width: 100%;">
+          <canvas id="revenueChart"></canvas>
+        </div>
       </div>
     </div>
-  </div>
-
-  <!-- Chart 2: Repairs bar Graph (Row 2 Right, col-lg-4) -->
-  <div class="col-lg-4">
-    <div class="glass-card" style="height: 395px;">
-      <h5 class="text-light mb-4"><i class="fa-solid fa-chart-bar me-2 text-info"></i>จำนวนงานซ่อมแยกรายเดือน</h5>
-      <div style="position: relative; height: 315px; width: 100%;">
-        <canvas id="repairsChart"></canvas>
+    <div class="col-lg-4">
+      <div class="glass-card" style="height: 395px;">
+        <h5 class="text-light mb-4"><i class="fa-solid fa-chart-bar me-2 text-info"></i>จำนวนงานซ่อมแยกรายเดือน</h5>
+        <div style="position: relative; height: 315px; width: 100%;">
+          <canvas id="repairsChart"></canvas>
+        </div>
       </div>
     </div>
-  </div>
+  <% } else { %>
+    <div class="col-lg-12">
+      <div class="glass-card" style="height: 395px;">
+        <h5 class="text-light mb-4"><i class="fa-solid fa-chart-bar me-2 text-info"></i>จำนวนงานซ่อมแยกรายเดือน (6 เดือนล่าสุด)</h5>
+        <div style="position: relative; height: 315px; width: 100%;">
+          <canvas id="repairsChart"></canvas>
+        </div>
+      </div>
+    </div>
+  <% } %>
 </div>
 
-<!-- Pipeline Status Breakdown Section (Row 3, Full Width) -->
+
 <div class="row g-4 mb-4">
   <div class="col-12">
     <div class="glass-card">
@@ -152,7 +172,7 @@
   </div>
 </div>
 
-<!-- Recent Repairs Section (Row 4, Full Width) -->
+
 <div class="row g-4">
   <div class="col-12">
     <div class="glass-card">
@@ -239,10 +259,10 @@
   </div>
 </div>
 
-<!-- ChartJS CDN -->
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<!-- Render Graph Scripts -->
+
 <script>
   document.addEventListener('DOMContentLoaded', function() {
     
@@ -251,52 +271,54 @@
     const revenueData = <%- charts.revenue %>;
     const repairsData = <%- charts.repairs %>;
 
-    // 1. Revenue Line Chart Setup
-    const revCtx = document.getElementById('revenueChart').getContext('2d');
-    new Chart(revCtx, {
-      type: 'line',
-      data: {
-        labels: labels,
-        datasets: [{
-          label: 'รายรับสะสม (บาท)',
-          data: revenueData,
-          borderColor: '#00E676', // Neon Success Green
-          backgroundColor: 'rgba(0, 230, 118, 0.1)',
-          borderWidth: 3,
-          tension: 0.3,
-          fill: true,
-          pointBackgroundColor: '#00E676',
-          pointHoverRadius: 7
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            display: false
-          }
+    const revCanvas = document.getElementById('revenueChart');
+    if (revCanvas) {
+      const revCtx = revCanvas.getContext('2d');
+      new Chart(revCtx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'รายรับสะสม (บาท)',
+            data: revenueData,
+            borderColor: '#00E676',
+            backgroundColor: 'rgba(0, 230, 118, 0.1)',
+            borderWidth: 3,
+            tension: 0.3,
+            fill: true,
+            pointBackgroundColor: '#00E676',
+            pointHoverRadius: 7
+          }]
         },
-        scales: {
-          y: {
-            grid: {
-              color: 'rgba(255, 255, 255, 0.05)'
-            },
-            ticks: {
-              color: '#94A3B8'
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: false
             }
           },
-          x: {
-            grid: {
-              display: false
+          scales: {
+            y: {
+              grid: {
+                color: 'rgba(255, 255, 255, 0.05)'
+              },
+              ticks: {
+                color: '#94A3B8'
+              }
             },
-            ticks: {
-              color: '#94A3B8'
+            x: {
+              grid: {
+                display: false
+              },
+              ticks: {
+                color: '#94A3B8'
+              }
             }
           }
         }
-      }
-    });
+      });
+    }
 
     // 2. Repairs Bar Chart Setup
     const repCtx = document.getElementById('repairsChart').getContext('2d');

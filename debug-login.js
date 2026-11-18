@@ -10,7 +10,7 @@ async function debug() {
       console.log(`Username: "${u.username}", Role: "${u.role}", Status: "${u.status}", Hash: "${u.password}"`);
     });
     
-    // Test comparison again
+
     if (rows.length > 0) {
       const match = await bcrypt.compare('owner123', rows[0].password);
       console.log(`Match check for ${rows[0].username} with "owner123":`, match);

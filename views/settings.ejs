@@ -6,9 +6,9 @@
 </div>
 
 <div class="row g-4">
-  <!-- Left Side: User management & Backup -->
+  
   <div class="col-lg-6">
-    <!-- Staff Reset Password Card -->
+    
     <div class="glass-card mb-4">
       <h5 class="text-warning mb-4"><i class="fa-solid fa-key me-2"></i>เปลี่ยนรหัสผ่านผู้ปฏิบัติงาน</h5>
       <form id="changePasswordForm" class="g-3">
@@ -31,7 +31,7 @@
       </form>
     </div>
 
-    <!-- PromptPay & Bank Settings Card -->
+    
     <div class="glass-card mb-4">
       <div class="d-flex justify-content-between align-items-center mb-3">
         <h5 class="text-warning mb-0"><i class="fa-solid fa-qrcode me-2 text-warning"></i>ตั้งค่าพร้อมเพย์ & บัญชีรับเงิน (PromptPay)</h5>
@@ -74,7 +74,7 @@
       </form>
     </div>
 
-    <!-- LINE Integration Card -->
+    
     <div class="glass-card mb-4">
       <div class="d-flex justify-content-between align-items-center mb-3">
         <h5 class="text-info mb-0"><i class="fa-brands fa-line me-2 text-success" style="font-size: 1.35rem;"></i>เชื่อมต่อระบบ LINE (LINE Official Account)</h5>
@@ -83,21 +83,21 @@
       <p class="text-muted small mb-4">ระบบแจ้งเตือนแบบใหม่ผ่าน LINE Official Account ส่งตรงหาลูกค้าและกลุ่มช่างแบบอัตโนมัติด้วยการ์ด Flex Message</p>
       
       <form id="lineConfigForm" class="g-3">
-        <!-- LINE Messaging API Channel Access Token -->
+        
         <div class="mb-3">
           <label for="lineChannelToken" class="form-label text-light fw-bold small"><i class="fa-solid fa-key text-warning me-1"></i> 1. LINE OA Channel Access Token (Long-lived) <span class="text-danger">*</span></label>
           <p class="text-muted" style="font-size: 0.75rem; margin-top: -5px; line-height: 1.3;">นำมาจาก LINE Developers Console &gt; Messaging API &gt; Channel access token</p>
           <input type="password" class="form-control form-glass text-light" id="lineChannelToken" value="<%= lineSettings.line_channel_token || '' %>" placeholder="กรอก Channel Access Token (ขึ้นต้นด้วย v1/v2 หรือตัวอักษรยาวๆ)...">
         </div>
         
-        <!-- LINE Owner User ID -->
+        
         <div class="mb-3">
           <label for="lineAdminId" class="form-label text-light fw-bold small"><i class="fa-solid fa-user-shield text-info me-1"></i> 2. LINE User ID ของเจ้าของร้าน (แจ้งเตือน & สั่งการส่วนตัว 1-on-1)</label>
           <p class="text-muted" style="font-size: 0.75rem; margin-top: -5px; line-height: 1.3;">User ID บัญชีส่วนตัวของคุณ (ขึ้นต้นด้วย <code>U...</code> ดูได้จากด้านล่างสุดของแท็บ Basic settings ใน LINE Developers Console)</p>
           <input type="text" class="form-control form-glass text-light" id="lineAdminId" value="<%= lineSettings.line_admin_id || '' %>" placeholder="เช่น U1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d">
         </div>
 
-        <!-- LINE Channel Secret -->
+        
         <div class="mb-3">
           <label for="lineChannelSecret" class="form-label text-light fw-bold small"><i class="fa-solid fa-shield-halved text-secondary me-1"></i> 3. LINE OA Channel Secret</label>
           <input type="password" class="form-control form-glass text-light" id="lineChannelSecret" value="<%= lineSettings.line_channel_secret || '' %>" placeholder="กรอก Channel Secret (ดูได้จากแท็บ Basic settings)...">
@@ -118,7 +118,7 @@
       </form>
     </div>
 
-    <!-- Backup & Restore Card -->
+    
     <div class="glass-card mb-4">
       <h5 class="text-success mb-4"><i class="fa-solid fa-database me-2"></i>ระบบสำรองและกู้คืนฐานข้อมูล (Database Backup / Restore)</h5>
       
@@ -149,7 +149,7 @@
     </div>
   </div>
 
-  <!-- Right Side: Audit Logs Table -->
+  
   <div class="col-lg-6">
     <div class="glass-card h-100">
       <h5 class="text-info mb-4"><i class="fa-solid fa-clipboard-list me-2"></i>บันทึกความปลอดภัยระบบ (Audit Logs)</h5>
@@ -188,7 +188,7 @@
   </div>
 </div>
 
-<!-- Scripts for Settings Actions -->
+
 <script>
   document.addEventListener('DOMContentLoaded', function() {
     

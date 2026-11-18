@@ -1,6 +1,6 @@
 const db = require('../config/db');
 
-// Get all vehicles with search, pagination and customers list for select dropdown
+
 const getAllVehicles = async (req, res) => {
   const search = req.query.search || '';
   const brand = req.query.brand || '';
@@ -13,10 +13,10 @@ const getAllVehicles = async (req, res) => {
   const offset = (page - 1) * limit;
 
   try {
-    // 1. Get all customers to fill in the select dropdown and filter
+
     const [customers] = await db.query('SELECT id, fullname, phone FROM customers ORDER BY fullname ASC');
 
-    // 2. Get unique filter options from vehicles table (Cascading Filters)
+
     const [brands] = await db.query('SELECT DISTINCT brand FROM vehicles WHERE brand IS NOT NULL AND brand != "" ORDER BY brand ASC');
 
     let modelsSql = 'SELECT DISTINCT model FROM vehicles WHERE model IS NOT NULL AND model != ""';
@@ -41,7 +41,7 @@ const getAllVehicles = async (req, res) => {
     yearsSql += ' ORDER BY year DESC';
     const [years] = await db.query(yearsSql, yearsParams);
 
-    // 3. Count total records for pagination
+
     let countSql = `
       SELECT COUNT(*) AS count 
       FROM vehicles v
@@ -75,7 +75,7 @@ const getAllVehicles = async (req, res) => {
     const [[{ count }]] = await db.query(countSql, paramsCount);
     const totalPages = Math.ceil(count / limit);
 
-    // 4. Select vehicles joining customer information
+
     let sql = `
       SELECT v.*, c.fullname AS customer_name, c.phone AS customer_phone 
       FROM vehicles v
@@ -109,6 +109,7 @@ const getAllVehicles = async (req, res) => {
     paramsSelect.push(limit, offset);
 
     const [rows] = await db.query(sql, paramsSelect);
+    const [colors] = await db.query('SELECT DISTINCT color FROM vehicles WHERE color IS NOT NULL AND color != "" ORDER BY color ASC');
 
     res.render('vehicles/index', {
       title: 'ข้อมูลรถยนต์',
@@ -118,7 +119,7 @@ const getAllVehicles = async (req, res) => {
       brands: brands,
       models: models,
       years: years,
-      colors: [],
+      colors: colors,
       search: search,
       selectedBrand: brand,
       selectedModel: model,
@@ -138,7 +139,7 @@ const getAllVehicles = async (req, res) => {
   }
 };
 
-// Add new vehicle
+
 const addVehicle = async (req, res) => {
   const { customer_id, license_plate, brand, model, year, color, vin } = req.body;
 
@@ -147,7 +148,7 @@ const addVehicle = async (req, res) => {
   }
 
   try {
-    // Check if plate already exists
+
     const [existing] = await db.query('SELECT id FROM vehicles WHERE license_plate = ?', [license_plate]);
     if (existing.length > 0) {
       return res.status(400).json({ success: false, message: 'เลขทะเบียนรถยนต์นี้ถูกลงทะเบียนไว้ในระบบแล้ว' });
@@ -174,7 +175,7 @@ const addVehicle = async (req, res) => {
   }
 };
 
-// Update vehicle details
+
 const editVehicle = async (req, res) => {
   const { id } = req.params;
   const { customer_id, license_plate, brand, model, year, color, vin } = req.body;
@@ -184,7 +185,7 @@ const editVehicle = async (req, res) => {
   }
 
   try {
-    // Check duplicate plate excluding current
+
     const [existing] = await db.query('SELECT id FROM vehicles WHERE license_plate = ? AND id != ?', [license_plate, id]);
     if (existing.length > 0) {
       return res.status(400).json({ success: false, message: 'เลขทะเบียนรถยนต์นี้ชนกับรถคันอื่นในระบบ' });
@@ -207,7 +208,7 @@ const editVehicle = async (req, res) => {
     ]);
 
     if (result.affectedRows === 0) {
-      return res.status(444).json({ success: false, message: 'ไม่พบข้อมูลรถยนต์ที่ต้องการแก้ไข' });
+      return res.status(404).json({ success: false, message: 'ไม่พบข้อมูลรถยนต์ที่ต้องการแก้ไข' });
     }
 
     res.json({ success: true, message: 'แก้ไขข้อมูลรถยนต์เรียบร้อยแล้ว' });
@@ -217,7 +218,6 @@ const editVehicle = async (req, res) => {
   }
 };
 
-// Delete vehicle
 const deleteVehicle = async (req, res) => {
   const { id } = req.params;
 
@@ -226,7 +226,7 @@ const deleteVehicle = async (req, res) => {
     const [result] = await db.query(sql, [id]);
 
     if (result.affectedRows === 0) {
-      return res.status(444).json({ success: false, message: 'ไม่พบข้อมูลรถยนต์ที่ต้องการลบ' });
+      return res.status(404).json({ success: false, message: 'ไม่พบข้อมูลรถยนต์ที่ต้องการลบ' });
     }
 
     res.json({ success: true, message: 'ลบข้อมูลรถยนต์เรียบร้อยแล้ว' });
@@ -236,7 +236,6 @@ const deleteVehicle = async (req, res) => {
   }
 };
 
-// View vehicle repair history
 const getRepairHistory = async (req, res) => {
   const { id } = req.params;
 
@@ -249,7 +248,7 @@ const getRepairHistory = async (req, res) => {
     `, [id]);
 
     if (vehicleRows.length === 0) {
-      return res.status(444).render('error', { title: 'ไม่พบรถยนต์', message: 'ไม่พบประวัติรถยนต์คันนี้ในระบบ' });
+      return res.status(404).render('error', { title: 'ไม่พบรถยนต์', message: 'ไม่พบประวัติรถยนต์คันนี้ในระบบ' });
     }
 
     const [repairRows] = await db.query(`

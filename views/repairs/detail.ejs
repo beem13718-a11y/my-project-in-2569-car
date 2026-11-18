@@ -7,7 +7,7 @@
   </a>
 </div>
 
-<!-- Progress Timeline -->
+
 <div class="glass-card mb-4">
   <h5 class="text-info mb-4"><i class="fa-solid fa-bars-progress me-2"></i>ขั้นตอนความคืบหน้าการซ่อมบำรุง</h5>
   
@@ -27,7 +27,7 @@
   %>
   
   <div class="d-flex justify-content-between position-relative px-2 py-4 flex-wrap text-center">
-    <!-- Progress Line -->
+    
     <div class="position-absolute top-50 start-0 translate-y-middle bg-secondary bg-opacity-25 w-100 d-none d-md-block" style="height: 4px; z-index: 1;"></div>
     <% if (currentIndex >= 0) { %>
       <div class="position-absolute top-50 start-0 translate-y-middle bg-primary w-100 d-none d-md-block" style="height: 4px; width: <%= (currentIndex / (statusSteps.length - 1)) * 100 %>%; z-index: 2; transition: width 0.4s ease;"></div>
@@ -52,9 +52,9 @@
 </div>
 
 <div class="row g-4">
-  <!-- Left Side: Basic Info & Mechanic assignment -->
+  
   <div class="col-lg-6">
-    <!-- Info Card -->
+    
     <div class="glass-card mb-4 h-100">
       <h5 class="text-warning mb-4"><i class="fa-solid fa-circle-info me-2"></i>ข้อมูลลูกค้าและรายละเอียดรถยนต์</h5>
       
@@ -99,17 +99,16 @@
     </div>
   </div>
 
-  <!-- Right Side: Action Forms -->
+  
   <div class="col-lg-6">
-    <!-- Manage Actions Card -->
+    
     <div class="glass-card mb-4">
       <h5 class="text-info mb-4"><i class="fa-solid fa-sliders me-2"></i>จัดการขั้นตอนและมอบหมายงาน</h5>
 
-      <!-- Action Tabs / Forms depending on role & status -->
+      
       <div class="accordion accordion-flush bg-transparent" id="actionsAccordion">
         
-        <!-- 1. Estimate price (Owner or admin only) -->
-        <% if (user.role === 'owner' && (repair.status === 'pending' || repair.status === 'inspecting')) { %>
+        <% if (['owner', 'receptionist', 'mechanic'].includes(user.role) && (repair.status === 'pending' || repair.status === 'inspecting')) { %>
           <div class="accordion-item bg-transparent text-light border-secondary border-opacity-25">
             <h2 class="accordion-header" id="headingEstimate">
               <button class="accordion-button bg-transparent text-light collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseEstimate" aria-expanded="false" aria-controls="collapseEstimate">
@@ -131,7 +130,7 @@
           </div>
         <% } %>
 
-        <!-- 2. Assign Mechanic & Check out spare parts -->
+        
         <% if (repair.status !== 'completed' && repair.status !== 'cancelled' && repair.status !== 'ready') { %>
           <div class="accordion-item bg-transparent text-light border-secondary border-opacity-25">
             <h2 class="accordion-header" id="headingAssign">
@@ -142,7 +141,7 @@
             <div id="collapseAssign" class="accordion-collapse collapse" aria-labelledby="headingAssign" data-bs-parent="#actionsAccordion">
               <div class="accordion-body">
                 <form id="assignForm" class="g-3">
-                  <!-- Mechanic Dropdown -->
+                  
                   <div class="mb-3">
                     <label for="assignMechanicId" class="form-label small">มอบหมายช่างผู้รับผิดชอบ</label>
                     <select class="form-select form-glass text-light" id="assignMechanicId">
@@ -153,7 +152,7 @@
                     </select>
                   </div>
                   
-                  <!-- Spare parts dropdown -->
+                  
                   <div class="mb-3">
                     <label for="partId" class="form-label small">เบิกอะไหล่ (หักสต็อกอัตโนมัติ)</label>
                     <div class="row g-2">
@@ -180,7 +179,7 @@
           </div>
         <% } %>
 
-        <!-- 3. Update Progress Status -->
+        
         <% if (repair.status !== 'completed' && repair.status !== 'cancelled' && repair.status !== 'ready') { %>
           <div class="accordion-item bg-transparent text-light border-secondary border-opacity-25">
             <h2 class="accordion-header" id="headingStatus">
@@ -218,7 +217,7 @@
           </div>
         <% } %>
 
-        <!-- 4. Close repair job ("บันทึกปิดงาน" with actual cost & warranty) -->
+        
         <% if (repair.status !== 'completed' && repair.status !== 'cancelled' && repair.status !== 'ready') { %>
           <div class="accordion-item bg-transparent text-light border-secondary border-opacity-25">
             <h2 class="accordion-header" id="headingClose">
@@ -231,7 +230,7 @@
                 <form id="closeJobForm" enctype="multipart/form-data" class="g-3">
                   <div class="mb-3">
                     <label for="closeActualCost" class="form-label small">ค่าซ่อมจริงรวมสุทธิ (บาท) <span class="text-danger">*</span></label>
-                    <!-- Prepopulate with estimated cost + sum of parts used -->
+                    
                     <%
                       let totalPartsCost = 0;
                       partsUsed.forEach(p => {
@@ -269,7 +268,7 @@
 
       </div>
 
-      <!-- PDF Invoice / Quotation Print trigger -->
+      
       <div class="mt-4 pt-3 border-top border-secondary border-opacity-25 d-grid">
         <button class="btn btn-glass-primary btn-lg" data-bs-toggle="modal" data-bs-target="#invoicePrintModal" id="btnOpenInvoiceModal">
           <i class="fa-solid fa-file-invoice-dollar me-2 text-warning"></i> พิมพ์ใบเสนอราคา / ใบเสร็จรับเงิน
@@ -280,7 +279,7 @@
 </div>
 
 <div class="row g-4 mt-2">
-  <!-- Spare Parts List Table -->
+  
   <div class="col-lg-7">
     <div class="glass-card mb-4">
       <h5 class="text-info mb-4"><i class="fa-solid fa-boxes-stacked me-2"></i>รายการอะไหล่และค่าแรงที่เบิกใช้งาน</h5>
@@ -326,7 +325,7 @@
     </div>
   </div>
 
-  <!-- Before / After Images -->
+  
   <div class="col-lg-5">
     <div class="glass-card mb-4 h-100">
       <h5 class="text-warning mb-4"><i class="fa-solid fa-images me-2"></i>รูปภาพเปรียบเทียบ Before & After</h5>
@@ -359,7 +358,7 @@
   </div>
 </div>
 
-<!-- Logs Timeline Card -->
+
 <div class="glass-card mt-4">
   <h5 class="text-light mb-4"><i class="fa-solid fa-history me-2"></i>ประวัติปูมบันทึกความคืบหน้า (Activity Logs)</h5>
   <div style="max-height: 300px; overflow-y: auto; padding-right: 10px;">
@@ -384,11 +383,9 @@
   </div>
 </div>
 
-<!-- ==========================================
-     MODALS
-     ========================================== -->
 
-<!-- Quotation & Invoice Print Modal with Dynamic PromptPay QR -->
+
+
 <%
   let partsTotalSum = 0;
   partsUsed.forEach(p => { partsTotalSum += (parseFloat(p.sell_price) * p.quantity); });
@@ -405,7 +402,7 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body p-4" id="printableInvoiceArea">
-        <!-- Header Section -->
+        
         <div class="d-flex justify-content-between align-items-start mb-3 pb-2 border-bottom border-dark border-2">
           <div>
             <h3 class="fw-bold m-0" style="color: #FF6B00; font-size: 1.45rem;"><i class="fa-solid fa-car-burst me-2"></i>BT AUTO GARAGE</h3>
@@ -419,7 +416,7 @@
           </div>
         </div>
         
-        <!-- Customer & Vehicle Details -->
+        
         <div class="row g-2 mb-3 p-2.5 border border-secondary border-opacity-25 rounded bg-light bg-opacity-50 small" style="font-size: 0.84rem;">
           <div class="col-6">
             <h6 class="fw-bold text-uppercase text-secondary mb-1" style="font-size: 0.82rem;">ข้อมูลลูกค้า</h6>
@@ -435,7 +432,7 @@
           </div>
         </div>
         
-        <!-- Items Table -->
+        
         <table class="table table-bordered border-secondary border-opacity-25 small mb-3">
           <thead class="table-light border-bottom border-dark">
             <tr>
@@ -472,20 +469,20 @@
           </tbody>
         </table>
         
-        <!-- PromptPay QR Code & Signatures Section in Quotation -->
+        
         <div class="border border-secondary border-opacity-25 rounded p-3 mb-3 bg-light">
           <div class="row align-items-center">
-            <!-- Left: PromptPay Dynamic QR -->
+            
             <div class="col-7">
               <div class="d-flex align-items-center">
-                <!-- QR Code Box -->
+                
                 <div class="border border-dark p-1 rounded bg-white text-center shadow-sm me-3" style="width: 108px; min-width: 108px; flex-shrink: 0;">
                   <img id="quotationPPQRImg" src="" alt="PromptPay QR" style="width: 98px; height: 98px; display: block; margin: 0 auto;">
                   <div class="text-white text-center fw-bold mt-1 py-0.5 rounded" style="font-size: 0.62rem; background-color: #002B49 !important;">
                     พร้อมเพย์ PromptPay
                   </div>
                 </div>
-                <!-- Text Details beside QR (Spacious & Clean) -->
+                
                 <div style="padding-left: 6px;">
                   <div class="fw-bold text-dark mb-1" style="font-size: 0.9rem;">
                     <i class="fa-solid fa-qrcode text-primary me-1.5"></i> สแกนเพื่อชำระเงิน / โอนมัดจำ
@@ -504,7 +501,7 @@
               </div>
             </div>
 
-            <!-- Right: Authorized Signature -->
+            
             <div class="col-5 text-end">
               <div class="text-center ms-auto" style="width: 180px;">
                 <div class="small text-muted mb-4" style="font-size: 0.78rem;">ลงชื่อผู้มีอำนาจออกเอกสาร</div>
@@ -686,7 +683,7 @@
 </script>
 
 
-<!-- Javascript for Repair Actions -->
+
 <script>
   document.addEventListener('DOMContentLoaded', function() {
     const repairId = '<%= repair.id %>';

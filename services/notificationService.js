@@ -1,6 +1,5 @@
 const db = require('../config/db');
 
-// Helper to query dynamic settings from DB
 const getSetting = async (key) => {
   try {
     const [[row]] = await db.query('SELECT value FROM settings WHERE `key` = ?', [key]);
@@ -11,7 +10,6 @@ const getSetting = async (key) => {
   }
 };
 
-// Core helper: Send LINE Push Message via LINE Messaging API
 const sendLinePush = async (toUserIdOrGroupId, messages) => {
   if (!toUserIdOrGroupId || toUserIdOrGroupId.trim() === '') {
     return { success: false, message: 'Target ID is empty' };
@@ -23,7 +21,6 @@ const sendLinePush = async (toUserIdOrGroupId, messages) => {
     return { success: false, message: 'Channel Access Token is not set' };
   }
 
-  // Format array if single message passed
   const msgPayload = Array.isArray(messages) ? messages : [messages];
 
   try {
@@ -53,7 +50,6 @@ const sendLinePush = async (toUserIdOrGroupId, messages) => {
   }
 };
 
-// Helper to send to Admin/Mechanic Group
 const sendToAdmin = async (messages) => {
   const adminId = await getSetting('line_admin_id');
   if (adminId && adminId.trim() !== '') {
@@ -62,11 +58,6 @@ const sendToAdmin = async (messages) => {
   return { success: false, message: 'No admin/group ID configured' };
 };
 
-// ==========================================
-// 1. FLEX MESSAGE TEMPLATES
-// ==========================================
-
-// Flex: รับรถเข้าซ่อมสำเร็จ (Job Created)
 const createCarReceivedFlex = (repairId, customerName, plate, description) => {
   return {
     type: 'flex',
@@ -176,7 +167,6 @@ const createCarReceivedFlex = (repairId, customerName, plate, description) => {
   };
 };
 
-// Flex: ใบเสนอราคาพร้อมอนุมัติ (Quotation Ready)
 const createQuoteReadyFlex = (repairId, customerName, cost) => {
   return {
     type: 'flex',
@@ -238,7 +228,6 @@ const createQuoteReadyFlex = (repairId, customerName, cost) => {
   };
 };
 
-// Flex: งานซ่อมเสร็จสิ้น พร้อมรับรถ (Repair Completed)
 const createRepairCompletedFlex = (repairId, customerName, cost) => {
   return {
     type: 'flex',
@@ -300,11 +289,6 @@ const createRepairCompletedFlex = (repairId, customerName, cost) => {
   };
 };
 
-// ==========================================
-// 2. MAIN NOTIFICATION DISPATCHERS
-// ==========================================
-
-// ส่งแจ้งเตือนเมื่อรับรถเข้าซ่อม ("รับรถเข้าระบบสำเร็จ")
 const sendCarReceivedNotification = async (repairId, customerName, plate, description) => {
   const flexMsg = createCarReceivedFlex(repairId, customerName, plate, description);
   const textMsg = {
@@ -312,10 +296,8 @@ const sendCarReceivedNotification = async (repairId, customerName, plate, descri
     text: `🚗 [BT Auto - รับรถเข้าซ่อม]\n• ใบซ่อม: #${repairId}\n• ทะเบียน: ${plate}\n• ลูกค้า: คุณ ${customerName}\n• อาการ: ${description}\n\n*ช่างกำลังดำเนินการตรวจสภาพตัวรถครับ*`
   };
 
-  // 1. Send to Admin/Staff Group
   await sendToAdmin([flexMsg]).catch(() => sendToAdmin([textMsg]));
 
-  // 2. Send to Customer LINE (if customer has line_id)
   try {
     const [[repair]] = await db.query('SELECT customer_id FROM repairs WHERE id = ?', [repairId]);
     if (repair && repair.customer_id) {
@@ -329,7 +311,6 @@ const sendCarReceivedNotification = async (repairId, customerName, plate, descri
   }
 };
 
-// ส่งแจ้งเตือนเมื่อตั้งราคาประเมิน ("ใบเสนอราคาพร้อมอนุมัติ")
 const sendQuoteReadyNotification = async (repairId, customerName, cost) => {
   const flexMsg = createQuoteReadyFlex(repairId, customerName, cost);
   const textMsg = {
@@ -337,10 +318,8 @@ const sendQuoteReadyNotification = async (repairId, customerName, cost) => {
     text: `💰 [BT Auto - ใบเสนอราคาพร้อมอนุมัติ]\n• ใบซ่อม: #${repairId}\n• ลูกค้า: คุณ ${customerName}\n• ยอดประเมิน: ${parseFloat(cost).toLocaleString()} บาท\n\n*โปรดติดต่ออู่เพื่อยืนยันการเริ่มงานซ่อมครับ*`
   };
 
-  // 1. Send to Admin Group
   await sendToAdmin([flexMsg]).catch(() => sendToAdmin([textMsg]));
 
-  // 2. Send to Customer LINE
   try {
     const [[repair]] = await db.query('SELECT customer_id FROM repairs WHERE id = ?', [repairId]);
     if (repair && repair.customer_id) {
@@ -354,7 +333,6 @@ const sendQuoteReadyNotification = async (repairId, customerName, cost) => {
   }
 };
 
-// ส่งแจ้งเตือนเมื่องานซ่อมเสร็จสิ้น ("ซ่อมเสร็จ พร้อมส่งมอบ")
 const sendRepairCompletedNotification = async (repairId, customerName, cost) => {
   const flexMsg = createRepairCompletedFlex(repairId, customerName, cost);
   const textMsg = {
@@ -362,10 +340,8 @@ const sendRepairCompletedNotification = async (repairId, customerName, cost) => 
     text: `✅ [BT Auto - ซ่อมเสร็จเรียบร้อย พร้อมรับรถ]\n• ใบซ่อม: #${repairId}\n• ลูกค้า: คุณ ${customerName}\n• ยอดค่าใช้จ่ายจริง: ${parseFloat(cost).toLocaleString()} บาท\n\n*สามารถติดต่อรับมอบรถคืนได้ที่อู่ BT Auto ขอบพระคุณครับ!*`
   };
 
-  // 1. Send to Admin Group
   await sendToAdmin([flexMsg]).catch(() => sendToAdmin([textMsg]));
 
-  // 2. Send to Customer LINE
   try {
     const [[repair]] = await db.query('SELECT customer_id FROM repairs WHERE id = ?', [repairId]);
     if (repair && repair.customer_id) {
@@ -379,7 +355,6 @@ const sendRepairCompletedNotification = async (repairId, customerName, cost) => 
   }
 };
 
-// Flex: ใบเสนอราคา / ใบเสร็จรับเงินฉบับเต็ม พร้อมข้อมูล PromptPay
 const createFullInvoiceFlex = ({ docType, docNo, repairId, customerName, phone, plate, carModel, desc, items, totalAmount, promptpayNumber, promptpayName, dateStr }) => {
   const isInvoice = docType === 'invoice';
   const headerBg = isInvoice ? '#198754' : '#FF6B00';
@@ -481,7 +456,6 @@ const createFullInvoiceFlex = ({ docType, docNo, repairId, customerName, phone, 
   };
 };
 
-// ส่งใบเสนอราคา / ใบเสร็จรับเงิน เข้า LINE (ทั้งลูกค้าและแอดมิน)
 const sendInvoiceQuotationNotification = async (repairId) => {
   try {
     const [repairs] = await db.query(`
@@ -544,18 +518,17 @@ const sendInvoiceQuotationNotification = async (repairId) => {
     };
 
     let sentCount = 0;
-    // 1. Send to Admin
+
     const adminRes = await sendToAdmin([flexMsg]).catch(() => sendToAdmin([textMsg]));
     if (adminRes && adminRes.success) sentCount++;
 
-    // 2. Send to Customer LINE (if customer has line_id)
     if (r.line_id && r.line_id.trim() !== '') {
       const custRes = await sendLinePush(r.line_id, [flexMsg]).catch(() => sendLinePush(r.line_id, [textMsg]));
       if (custRes && custRes.success) sentCount++;
     }
 
-    return { 
-      success: true, 
+    return {
+      success: true,
       sentToAdmin: !!(adminRes && adminRes.success),
       sentToCustomer: !!(r.line_id && r.line_id.trim() !== ''),
       customerName: r.customer_name
@@ -566,7 +539,6 @@ const sendInvoiceQuotationNotification = async (repairId) => {
   }
 };
 
-// ส่งแจ้งเตือนแอดมินเมื่อสต็อกอะไหล่ต่ำกว่าเกณฑ์
 const sendLowStockNotification = async (partName, currentStock, minQty) => {
   const textMsg = {
     type: 'text',
@@ -575,7 +547,6 @@ const sendLowStockNotification = async (partName, currentStock, minQty) => {
   await sendToAdmin([textMsg]);
 };
 
-// Direct message to specific customer
 const sendLineCustomerMessage = async (customerId, message) => {
   try {
     const [[customer]] = await db.query("SELECT line_id, fullname FROM customers WHERE id = ?", [customerId]);

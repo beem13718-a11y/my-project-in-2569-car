@@ -4,7 +4,7 @@ const systemController = require('../controllers/systemController');
 const { isAuthenticated, isOwner } = require('../middleware/authMiddleware');
 
 router.use(isAuthenticated);
-router.use(isOwner); // Settings are restricted to owner role
+router.use(isOwner);
 
 router.get('/', systemController.getSettings);
 router.post('/change-password', systemController.updatePassword);

@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %> | สมาร์ทการาจ (SmartGarage)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Prompt', 'Segoe UI', Tahoma, sans-serif;
+    }
+    body {
+      min-height: 100vh;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #111827 0%, #1e293b 65%, #334155 100%);
+    }
+    .garage-taskbar {
+      position: sticky;
+      top: 0;
+      z-index: 1050;
+      background: rgba(11, 17, 32, 0.96);
+      backdrop-filter: blur(12px);
+      border-bottom: 2px solid #0ea5e9;
+      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.65);
+      padding: 12px 0;
+    }
+    .taskbar-container {
+      max-width: 1320px;
+      margin: 0 auto;
+      padding: 0 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 14px;
+    }
+    .brand-link {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+    }
+    .brand-logo-box {
+      width: 46px;
+      height: 46px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #0284c7, #2563eb);
+      border: 1px solid #38bdf8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      font-size: 1.35rem;
+      box-shadow: 0 0 14px rgba(14, 165, 233, 0.35);
+    }
+    .brand-name-th {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: #ffffff;
+      line-height: 1.15;
+    }
+    .brand-name-sub {
+      font-size: 0.78rem;
+      color: #38bdf8;
+      font-weight: 600;
+    }
+    .taskbar-nav {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .taskbar-link {
+      color: #e2e8f0;
+      text-decoration: none;
+      font-size: 0.98rem;
+      font-weight: 600;
+      padding: 8px 15px;
+      border-radius: 10px;
+      transition: all 0.15s ease;
+    }
+    .taskbar-link:hover {
+      background: rgba(14, 165, 233, 0.18);
+      color: #38bdf8;
+    }
+    .taskbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .btn-task-track {
+      background: linear-gradient(135deg, #059669, #10b981);
+      color: #ffffff;
+      text-decoration: none;
+      font-size: 0.96rem;
+      font-weight: 700;
+      padding: 9px 16px;
+      border-radius: 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid #34d399;
+    }
+    .btn-task-login {
+      background: linear-gradient(135deg, #0284c7, #2563eb);
+      color: #ffffff;
+      text-decoration: none;
+      font-size: 0.96rem;
+      font-weight: 700;
+      padding: 9px 16px;
+      border-radius: 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid #38bdf8;
+    }
+    .track-wrapper {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 36px 15px;
+    }
+    .step-item {
+      flex: 1;
+      text-align: center;
+      position: relative;
+      font-size: 0.82rem;
+    }
+    .step-circle {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255,255,255,0.08);
+      color: #94A3B8;
+      border: 2px solid rgba(255,255,255,0.15);
+      margin-bottom: 6px;
+      font-weight: bold;
+    }
+    .step-item.active .step-circle {
+      background: #10b981;
+      color: #fff;
+      border-color: #10b981;
+      box-shadow: 0 0 12px rgba(16, 185, 129, 0.5);
+    }
+    .step-item.current .step-circle {
+      background: #0ea5e9;
+      color: #fff;
+      border-color: #38bdf8;
+      box-shadow: 0 0 14px rgba(14, 165, 233, 0.6);
+    }
+  </style>
+</head>
+<body>
+
+  <header class="garage-taskbar">
+    <div class="taskbar-container">
+      <a href="/" class="brand-link">
+        <div class="brand-logo-box">
+          <i class="fa-solid fa-screwdriver-wrench"></i>
+        </div>
+        <div>
+          <div class="brand-name-th">สมาร์ทการาจ (SmartGarage)</div>
+          <div class="brand-name-sub">อู่ซ่อมรถยนต์มาตรฐาน • ซื่อสัตย์ โปร่งใส เช็กสถานะได้ 24 ชม.</div>
+        </div>
+      </a>
+
+      <div class="taskbar-actions">
+        <a href="/public/track" class="btn-task-track">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <span>เช็กสถานะรถลูกค้า</span>
+        </a>
+        <a href="/auth/login" class="btn-task-login">
+          <i class="fa-solid fa-right-to-bracket"></i>
+          <span>เข้าสู่ระบบพนักงาน</span>
+        </a>
+      </div>
+
+      <nav class="taskbar-nav">
+        <a href="/#hero" class="taskbar-link"><i class="fa-solid fa-house me-1"></i> หน้าแรก</a>
+        <a href="/#services" class="taskbar-link"><i class="fa-solid fa-gears me-1"></i> บริการของอู่</a>
+        <a href="/#reviews" class="taskbar-link"><i class="fa-solid fa-star me-1"></i> รีวิวจากลูกค้า</a>
+        <a href="/#contact" class="taskbar-link"><i class="fa-solid fa-phone-volume me-1"></i> ติดต่ออู่</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="track-wrapper">
+    <div class="glass-card mb-4" style="border-top: 5px solid #0ea5e9;">
+      <h4 class="text-light fw-bold mb-3"><i class="fa-solid fa-car-side text-info me-2"></i>ตรวจสอบสถานะงานซ่อมรถยนต์ของคุณ</h4>
+      <form action="/public/track" method="GET" class="row g-2">
+        <div class="col-md-9 col-sm-8">
+          <input type="text" name="plate" class="form-control form-control-lg form-glass text-light" value="<%= queryPlate || '' %>" placeholder="กรอกเลขทะเบียนรถ เช่น กก 1234, รน 5678, วว 9999..." required>
+        </div>
+        <div class="col-md-3 col-sm-4 d-grid">
+          <button type="submit" class="btn btn-lg fw-bold text-white" style="background: linear-gradient(135deg, #0284c7, #2563eb);">
+            <i class="fa-solid fa-search me-1"></i> ค้นหารถของฉัน
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <% if (queryPlate && (!repairs || repairs.length === 0)) { %>
+      <div class="glass-card text-center py-5">
+        <i class="fa-solid fa-car fa-3x text-warning mb-3"></i>
+        <h5 class="text-light">ไม่พบข้อมูลงานซ่อมสำหรับทะเบียน "<%= queryPlate %>"</h5>
+        <p class="text-muted small mb-0">กรุณาตรวจสอบตัวอักษรหรือหมายเลขทะเบียนรถยนต์อีกครั้ง (ตัวอย่างทะเบียนในระบบ: กก 1234, รน 5678, วว 9999)</p>
+      </div>
+    <% } %>
+
+    <% if (repairs && repairs.length > 0) { %>
+      <%
+        const steps = [
+          { key: 'pending', label: 'รับรถ', icon: 'fa-clipboard-check' },
+          { key: 'inspecting', label: 'ตรวจเช็ก', icon: 'fa-magnifying-glass' },
+          { key: 'waiting_parts', label: 'รออะไหล่', icon: 'fa-boxes-packing' },
+          { key: 'repairing', label: 'กำลังซ่อม', icon: 'fa-screwdriver-wrench' },
+          { key: 'checking', label: 'ตรวจคุณภาพ', icon: 'fa-shield-halved' },
+          { key: 'ready', label: 'พร้อมส่งมอบ', icon: 'fa-bell' },
+          { key: 'completed', label: 'ส่งมอบแล้ว', icon: 'fa-circle-check' }
+        ];
+        const statusOrder = steps.map(s => s.key);
+      %>
+      <% repairs.forEach(r => {
+        const currentIdx = statusOrder.indexOf(r.status);
+        const totalCost = parseFloat(r.actual_cost) > 0 ? parseFloat(r.actual_cost) : parseFloat(r.estimated_cost || 0);
+      %>
+        <div class="glass-card mb-4">
+          <div class="d-flex flex-wrap justify-content-between align-items-center border-bottom border-secondary border-opacity-25 pb-3 mb-3 gap-2">
+            <div>
+              <span class="badge bg-warning text-dark font-monospace fs-6 px-3 py-1 me-2"><%= r.license_plate %></span>
+              <span class="text-light fw-bold"><%= r.brand %> <%= r.model %> (<%= r.color || '-' %>)</span>
+            </div>
+            <div class="text-end">
+              <span class="text-muted small">ใบสั่งซ่อม #<%= r.id %> | วันที่รับรถ: <%= new Date(r.created_at).toLocaleDateString('th-TH') %></span>
+            </div>
+          </div>
+
+          <% if (r.status === 'cancelled') { %>
+            <div class="alert alert-danger bg-danger bg-opacity-25 text-light border-0">
+              <i class="fa-solid fa-ban me-2"></i> งานซ่อมนี้ถูกยกเลิกแล้ว
+            </div>
+          <% } else { %>
+            <div class="d-flex justify-content-between align-items-start my-4 flex-wrap gap-2">
+              <% steps.forEach((st, idx) => {
+                let cls = '';
+                if (idx < currentIdx) cls = 'active';
+                else if (idx === currentIdx) cls = 'current';
+              %>
+                <div class="step-item <%= cls %>">
+                  <div class="step-circle"><i class="fa-solid <%= st.icon %>"></i></div>
+                  <div class="<%= idx <= currentIdx ? 'text-light fw-bold' : 'text-muted' %>"><%= st.label %></div>
+                </div>
+              <% }) %>
+            </div>
+          <% } %>
+
+          <div class="row g-3 mt-2">
+            <div class="col-md-7">
+              <div class="p-3 rounded-3 bg-dark bg-opacity-50 h-100">
+                <div class="text-muted small mb-1">อาการที่แจ้ง / รายละเอียดงานซ่อม:</div>
+                <div class="text-light fw-semibold mb-3"><%= r.description %></div>
+                <div class="text-muted small mb-1">ช่างผู้รับผิดชอบ: <span class="text-warning fw-bold"><%= r.mechanic_name || 'กำลังจัดสรรช่าง' %></span></div>
+                <% if (r.warranty_expire_date) { %>
+                  <div class="text-muted small mt-1">รับประกันถึง: <span class="text-success fw-bold"><%= new Date(r.warranty_expire_date).toLocaleDateString('th-TH') %></span></div>
+                <% } %>
+                <% if (r.parts && r.parts.length > 0) { %>
+                  <div class="mt-3 pt-2 border-top border-secondary border-opacity-25">
+                    <div class="text-muted small mb-1">รายการอะไหล่ที่เปลี่ยน:</div>
+                    <ul class="mb-0 small text-light ps-3">
+                      <% r.parts.forEach(p => { %>
+                        <li><%= p.part_name %> x <%= p.quantity %> ชิ้น (<%= (parseFloat(p.sell_price) * p.quantity).toLocaleString() %> ฿)</li>
+                      <% }) %>
+                    </ul>
+                  </div>
+                <% } %>
+              </div>
+            </div>
+
+            <div class="col-md-5">
+              <div class="p-3 rounded-3 bg-dark bg-opacity-50 h-100 d-flex flex-column justify-content-between text-center">
+                <div>
+                  <div class="text-muted small">ยอดค่าบริการ<%= parseFloat(r.actual_cost) > 0 ? 'สุทธิ' : 'ประเมินเบื้องต้น' %></div>
+                  <div class="h3 fw-bold text-success font-monospace my-2"><%= totalCost.toLocaleString('th-TH', { minimumFractionDigits: 2 }) %> ฿</div>
+                </div>
+                <% if (totalCost > 0 && (r.status === 'ready' || r.status === 'inspecting' || r.status === 'completed')) { %>
+                  <div>
+                    <button type="button" class="btn btn-sm btn-warning fw-bold w-100 show-track-qr-btn" data-amount="<%= totalCost %>">
+                      <i class="fa-solid fa-qrcode me-1"></i> แสดง QR พร้อมเพย์ชำระเงิน
+                    </button>
+                    <div class="mt-2 d-none track-qr-box bg-white p-2 rounded-3">
+                      <img src="" class="img-fluid track-qr-img" style="max-width: 170px;" alt="PromptPay QR">
+                    </div>
+                  </div>
+                <% } %>
+              </div>
+            </div>
+          </div>
+
+          <% if (r.car_photo_before || r.car_photo_after) { %>
+            <div class="row g-3 mt-2">
+              <% if (r.car_photo_before) { %>
+                <div class="col-6 text-center">
+                  <div class="small text-muted mb-1">ภาพสภาพรถก่อนซ่อม (Before)</div>
+                  <img src="<%= r.car_photo_before %>" class="img-fluid rounded-3 border border-secondary border-opacity-25" style="max-height: 200px; object-fit: cover;" alt="Before">
+                </div>
+              <% } %>
+              <% if (r.car_photo_after) { %>
+                <div class="col-6 text-center">
+                  <div class="small text-muted mb-1">ภาพสภาพรถหลังซ่อมเสร็จ (After)</div>
+                  <img src="<%= r.car_photo_after %>" class="img-fluid rounded-3 border border-success border-opacity-50" style="max-height: 200px; object-fit: cover;" alt="After">
+                </div>
+              <% } %>
+            </div>
+          <% } %>
+        </div>
+      <% }) %>
+    <% } %>
+  </div>
+
+  <script>
+    document.querySelectorAll('.show-track-qr-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const amount = this.dataset.amount;
+        const box = this.nextElementSibling;
+        const img = box.querySelector('.track-qr-img');
+        fetch('/api/qr/promptpay?amount=' + amount)
+          .then(res => res.json())
+          .then(data => {
+            if (data.success) {
+              img.src = data.qrDataUrl;
+              box.classList.remove('d-none');
+            }
+          });
+      });
+    });
+  </script>
+</body>
+</html>

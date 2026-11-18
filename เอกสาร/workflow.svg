@@ -1,0 +1,143 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1260" width="100%" height="100%">
+  <defs>
+    <!-- หัวลูกศรสีดำมาตรฐาน -->
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#000000" />
+    </marker>
+  </defs>
+
+  <style>
+    .bg { fill: #ffffff; }
+    .box-process { fill: #ffffff; stroke: #000000; stroke-width: 2; }
+    .box-terminator { fill: #ffffff; stroke: #000000; stroke-width: 2; rx: 22; ry: 22; }
+    .box-decision { fill: #ffffff; stroke: #000000; stroke-width: 2; }
+    .line-flow { fill: none; stroke: #000000; stroke-width: 2; }
+    .tag-box { fill: #ffffff; stroke: #000000; stroke-width: 1; }
+    .tag-text { font-family: 'Sarabun', 'Noto Sans Thai', 'Thonburi', Tahoma, sans-serif; font-size: 13px; fill: #000000; text-anchor: middle; dominant-baseline: central; }
+    .node-text { font-family: 'Sarabun', 'Noto Sans Thai', 'Thonburi', Tahoma, sans-serif; font-size: 14px; fill: #000000; text-anchor: middle; dominant-baseline: central; }
+    .node-text-bold { font-family: 'Sarabun', 'Noto Sans Thai', 'Thonburi', Tahoma, sans-serif; font-size: 14px; font-weight: bold; fill: #000000; text-anchor: middle; dominant-baseline: central; }
+  </style>
+
+  <!-- พื้นหลังสีขาว -->
+  <rect width="100%" height="100%" class="bg" />
+
+  <!-- จุดเริ่มต้น -->
+  <rect x="390" y="35" width="220" height="44" class="box-terminator" />
+  <text x="500" y="57" class="node-text-bold">ลูกค้านำรถเข้าซ่อม</text>
+
+  <!-- เส้นเชื่อม -> รับรถ -->
+  <line x1="500" y1="79" x2="500" y2="115" class="line-flow" marker-end="url(#arrow)" />
+
+  <!-- รับรถ & ถ่ายรูปก่อนซ่อม -->
+  <rect x="280" y="115" width="440" height="46" class="box-process" />
+  <text x="500" y="138" class="node-text">รับรถ บันทึกข้อมูลลูกค้า และถ่ายรูปก่อนซ่อม</text>
+
+  <!-- เส้นเชื่อม -> แจ้งเตือนเข้าคิว -->
+  <line x1="500" y1="161" x2="500" y2="195" class="line-flow" marker-end="url(#arrow)" />
+
+  <!-- แจ้งเตือนรับรถเข้าคิว -->
+  <rect x="305" y="195" width="390" height="46" class="box-process" />
+  <text x="500" y="218" class="node-text">ส่งข้อความแจ้งเตือนรับรถเข้าคิวทางไลน์</text>
+
+  <!-- เส้นเชื่อม -> ตรวจเช็กอาการ -->
+  <line x1="500" y1="241" x2="500" y2="275" class="line-flow" marker-end="url(#arrow)" />
+
+  <!-- ตรวจเช็กอาการ & เสนอราคา -->
+  <rect x="325" y="275" width="350" height="46" class="box-process" />
+  <text x="500" y="298" class="node-text">ตรวจเช็กอาการ และออกใบเสนอราคา</text>
+
+  <!-- เส้นเชื่อม -> จุดตัดสินใจอนุมัติ -->
+  <line x1="500" y1="321" x2="500" y2="355" class="line-flow" marker-end="url(#arrow)" />
+
+  <!-- จุดตัดสินใจ: อนุมัติการซ่อม -->
+  <polygon points="500,355 660,395 500,435 340,395" class="box-decision" />
+  <text x="500" y="395" class="node-text-bold">ลูกค้าอนุมัติการซ่อม</text>
+
+  <!-- ================= กิ่งขวา: ไม่อนุมัติ ================= -->
+  <path d="M 660 395 L 820 395 L 820 455" class="line-flow" marker-end="url(#arrow)" />
+  <rect x="705" y="384" width="70" height="22" class="tag-box" />
+  <text x="740" y="395" class="tag-text">ไม่อนุมัติ</text>
+
+  <!-- ยกเลิกใบสั่งซ่อม -->
+  <rect x="705" y="455" width="230" height="46" class="box-process" />
+  <text x="820" y="478" class="node-text">ยกเลิกใบสั่งซ่อม และส่งคืนรถ</text>
+
+  <line x1="820" y1="501" x2="820" y2="535" class="line-flow" marker-end="url(#arrow)" />
+  <rect x="735" y="535" width="170" height="42" class="box-terminator" />
+  <text x="820" y="556" class="node-text-bold">ยกเลิกงานซ่อม</text>
+
+  <!-- ================= กิ่งลง: อนุมัติ ================= -->
+  <line x1="500" y1="435" x2="500" y2="510" class="line-flow" marker-end="url(#arrow)" />
+  <rect x="470" y="462" width="60" height="22" class="tag-box" />
+  <text x="500" y="473" class="tag-text">อนุมัติ</text>
+
+  <!-- จ่ายงานช่าง -->
+  <rect x="360" y="510" width="280" height="46" class="box-process" />
+  <text x="500" y="533" class="node-text">จ่ายงานช่างตามความชำนาญ</text>
+
+  <!-- เส้นเชื่อม -> ตรวจสอบอะไหล่ -->
+  <line x1="500" y1="556" x2="500" y2="590" class="line-flow" marker-end="url(#arrow)" />
+
+  <!-- จุดตัดสินใจ: สต็อกอะไหล่ -->
+  <polygon points="500,590 650,630 500,670 350,630" class="box-decision" />
+  <text x="500" y="630" class="node-text-bold">มีอะไหล่พร้อมในคลัง</text>
+
+  <!-- ================= กิ่งซ้าย: ไม่พอ สั่งซื้อ ================= -->
+  <path d="M 350 630 L 175 630 L 175 680" class="line-flow" marker-end="url(#arrow)" />
+  <rect x="215" y="619" width="95" height="22" class="tag-box" />
+  <text x="262" y="630" class="tag-text">ไม่พอ สั่งซื้อ</text>
+
+  <!-- กล่องสถานะรออะไหล่ -->
+  <rect x="70" y="680" width="210" height="52" class="box-process" />
+  <text x="175" y="697" class="node-text">ตั้งสถานะ &quot;รออะไหล่&quot;</text>
+  <text x="175" y="717" class="node-text">และแจ้งเตือนสั่งซื้อทางไลน์</text>
+
+  <!-- วนกลับเข้าสู่การเบิกอะไหล่เมื่อของมาถึง -->
+  <path d="M 175 732 L 175 778 L 335 778" class="line-flow" marker-end="url(#arrow)" />
+  <rect x="205" y="767" width="95" height="22" class="tag-box" />
+  <text x="252" y="778" class="tag-text">เมื่ออะไหล่มา</text>
+
+  <!-- ================= กิ่งลง: อะไหล่พร้อม ================= -->
+  <line x1="500" y1="670" x2="500" y2="755" class="line-flow" marker-end="url(#arrow)" />
+  <rect x="475" y="702" width="50" height="22" class="tag-box" />
+  <text x="500" y="713" class="tag-text">พร้อม</text>
+
+  <!-- เบิกอะไหล่ -->
+  <rect x="335" y="755" width="330" height="46" class="box-process" />
+  <text x="500" y="778" class="node-text">เบิกอะไหล่และตัดสต็อกทันที</text>
+
+  <!-- เส้นเชื่อม -> ลงมือซ่อม -->
+  <line x1="500" y1="801" x2="500" y2="835" class="line-flow" marker-end="url(#arrow)" />
+
+  <!-- ลงมือซ่อม -->
+  <rect x="360" y="835" width="280" height="46" class="box-process" />
+  <text x="500" y="858" class="node-text">ช่างลงมือซ่อมตามขั้นตอน</text>
+
+  <!-- เส้นเชื่อม -> ตรวจสอบคุณภาพ -->
+  <line x1="500" y1="881" x2="500" y2="915" class="line-flow" marker-end="url(#arrow)" />
+
+  <!-- QC & ประกัน -->
+  <rect x="270" y="915" width="460" height="46" class="box-process" />
+  <text x="500" y="938" class="node-text">ตรวจเช็กคุณภาพ ถ่ายรูปหลังซ่อม และระบุประกัน</text>
+
+  <!-- เส้นเชื่อม -> แจ้งเตือนเสร็จ -->
+  <line x1="500" y1="961" x2="500" y2="995" class="line-flow" marker-end="url(#arrow)" />
+
+  <!-- แจ้งเตือนรถเสร็จ -->
+  <rect x="275" y="995" width="450" height="46" class="box-process" />
+  <text x="500" y="1018" class="node-text">แจ้งเตือนรถซ่อมเสร็จ และส่งใบแจ้งหนี้ทางไลน์</text>
+
+  <!-- เส้นเชื่อม -> ชำระเงิน -->
+  <line x1="500" y1="1041" x2="500" y2="1075" class="line-flow" marker-end="url(#arrow)" />
+
+  <!-- ชำระเงิน & ลงบัญชี -->
+  <rect x="265" y="1075" width="470" height="46" class="box-process" />
+  <text x="500" y="1098" class="node-text">ชำระเงิน ตรวจสอบยอด และลงบันทึกบัญชีอัตโนมัติ</text>
+
+  <!-- เส้นเชื่อม -> ส่งมอบรถ -->
+  <line x1="500" y1="1121" x2="500" y2="1155" class="line-flow" marker-end="url(#arrow)" />
+
+  <!-- จุดสิ้นสุด -->
+  <rect x="365" y="1155" width="270" height="44" class="box-terminator" />
+  <text x="500" y="1177" class="node-text-bold">ส่งมอบรถ พร้อมใบรับประกัน</text>
+</svg>

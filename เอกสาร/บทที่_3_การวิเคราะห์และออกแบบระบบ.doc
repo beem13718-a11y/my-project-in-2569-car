@@ -1,0 +1,731 @@
+<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+<head>
+<meta charset="utf-8">
+<title>บทที่ 3 การวิเคราะห์และออกแบบระบบ</title>
+<!--[if gte mso 9]>
+<xml>
+ <w:WordDocument>
+  <w:View>Print</w:View>
+  <w:Zoom>100</w:Zoom>
+  <w:DoNotOptimizeForBrowser/>
+ </w:WordDocument>
+</xml>
+<![endif]-->
+<style>
+@page {
+    size: 21.0cm 29.7cm; /* A4 */
+    margin: 3.81cm 2.54cm 2.54cm 3.81cm; /* Top 1.5 in, Right 1.0 in, Bottom 1.0 in, Left 1.5 in */
+    mso-page-orientation: portrait;
+}
+body {
+    font-family: 'TH Sarabun New', 'TH SarabunPSK', sans-serif;
+    font-size: 16pt;
+    line-height: 1.15;
+    color: #000000;
+}
+h1 {
+    font-size: 18pt;
+    font-weight: bold;
+    text-align: center;
+    margin-top: 18pt;
+    margin-bottom: 12pt;
+}
+h2 {
+    font-size: 18pt;
+    font-weight: bold;
+    text-align: left;
+    margin-top: 14pt;
+    margin-bottom: 6pt;
+}
+h3 {
+    font-size: 16pt;
+    font-weight: bold;
+    margin-top: 10pt;
+    margin-bottom: 4pt;
+}
+h4 {
+    font-size: 16pt;
+    font-weight: bold;
+    margin-top: 8pt;
+    margin-bottom: 2pt;
+}
+p {
+    text-indent: 1.27cm;
+    text-align: justify;
+    margin-top: 0;
+    margin-bottom: 4pt;
+}
+p.bullet {
+    text-indent: 0;
+    margin-left: 1.27cm;
+    margin-top: 2pt;
+    margin-bottom: 2pt;
+}
+p.numbered {
+    text-indent: 0;
+    margin-left: 1.27cm;
+    margin-top: 3pt;
+    margin-bottom: 3pt;
+}
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-top: 10pt;
+    margin-bottom: 10pt;
+    font-size: 14pt;
+}
+th {
+    border: 1pt solid #000000;
+    background-color: #EBF1F5;
+    padding: 6pt 8pt;
+    font-weight: bold;
+    text-align: center;
+}
+td {
+    border: 1pt solid #000000;
+    padding: 4pt 6pt;
+    vertical-align: top;
+}
+.code-box {
+    background-color: #F6F8FA;
+    border: 1pt solid #D1D5DB;
+    padding: 8pt;
+    font-family: Consolas, monospace;
+    font-size: 10pt;
+    white-space: pre-wrap;
+    margin: 8pt 0;
+}
+hr {
+    border: none;
+    border-top: 1pt solid #CCCCCC;
+    margin: 12pt 0;
+}
+</style>
+</head>
+<body>
+<h1>บทที่ 3</h1>
+<h1>การวิเคราะห์และออกแบบระบบ (System Analysis and Design)</h1>
+<p>การดำเนินงานวิจัยและพัฒนาระบบบริหารจัดการอู่ซ่อมบำรุงยานยนต์ (Automotive Workshop Management System) ได้นำระเบียบวิธีวิจัยและวงจรการพัฒนาระบบเชิงโครงสร้างผสมผสานอไจล์ (Agile Software Development Life Cycle: Agile SDLC) มาประยุกต์ใช้ เพื่อให้การพัฒนาระบบสอดรับกับสภาพแวดล้อมการทำงานจริงของศูนย์บริการและอู่ซ่อมยานยนต์ขนาดย่อมและขนาดกลาง เนื้อหาในบทนี้นำเสนอรายละเอียดการวิเคราะห์ความต้องการ การออกแบบสถาปัตยกรรมระบบ ผังลำดับการปฏิบัติงาน แบบจำลองกรณีการใช้งาน แผนภาพกระแสข้อมูล แบบจำลองฐานข้อมูลเชิงกายภาพ โครงสร้างแฟ้มข้อมูล ตลอดจนการออกแบบส่วนต่อประสานผู้ใช้ทั้งบนเว็บแอปพลิเคชัน อุปกรณ์เคลื่อนที่ และระบบภายนอกอย่างสมบูรณ์</p>
+<hr/>
+<h2>3.1 ความต้องการของระบบ (System Requirements)</h2>
+<p>การกำหนดความต้องการของระบบจำแนกออกเป็น 2 มิติหลัก ได้แก่ ความต้องการเชิงหน้าที่ ซึ่งระบุถึงคุณสมบัติทางกระบวนการทำงานที่ระบบต้องรองรับ และความต้องการที่ไม่ใช่เชิงหน้าที่ ซึ่งระบุถึงเกณฑ์มาตรฐานเชิงคุณภาพ คุณภาพการให้บริการ และความปลอดภัยของระบบ</p>
+<h3>3.1.1 ความต้องการเชิงหน้าที่ (Functional Requirements)</h3>
+<p>ระบบบริหารจัดการอู่ซ่อมบำรุงยานยนต์ครอบคลุมกระบวนการทางธุรกิจหลัก 9 โมดูล ดังนี้:</p>
+<p class="numbered"><b>1.</b> <b>ระบบการพิสูจน์สิทธิ์และการจัดการสิทธิ์การเข้าใช้งาน (Authentication and Role-Based Access Control Subsystem - FR-01):</b></p>
+<p class="bullet">• &nbsp; ผู้ใช้ต้องยืนยันตัวตนด้วยชื่อผู้ใช้ (Username) และรหัสผ่านที่เข้ารหัสแบบ Secure Hashing (Bcrypt)</p>
+<p class="bullet">• &nbsp; รองรับการแบ่งบทบาทผู้ใช้งานภายในออกเป็น 2 ระดับอย่างเคร่งครัด ได้แก่:</p>
+<p class="bullet">• &nbsp; <b>เจ้าของอู่ / ผู้ดูแลระบบ (Workshop Owner / Administrator):</b> มีสิทธิ์เข้าถึงทุกส่วนของระบบ รวมถึงการเงิน บัญชี และการตั้งค่าระบบ</p>
+<p class="bullet">• &nbsp; <b>ช่างซ่อมบำรุง (Mechanic / Technician):</b> มีสิทธิ์บันทึกการตรวจเช็ก อัปเดตสถานะงานซ่อม เบิกอะไหล่ และสแกนเวลาเข้าปฏิบัติงาน</p>
+<p class="bullet">• &nbsp; บันทึกประวัติการเข้าใช้งานและกิจกรรมสำคัญลงในบันทึกการตรวจสอบระบบ (Audit Trail)</p>
+<p class="numbered"><b>2.</b> <b>ระบบบริหารจัดการข้อมูลลูกค้าและประวัติยานยนต์ (Customer & Vehicle Registration Subsystem - FR-02):</b></p>
+<p class="bullet">• &nbsp; บันทึกและสืบค้นข้อมูลประวัติลูกค้า ประกอบด้วย ชื่อ-นามสกุล, เบอร์โทรศัพท์, อีเมล, ที่อยู่ และ LINE User ID</p>
+<p class="bullet">• &nbsp; บันทึกรายละเอียดข้อมูลยานยนต์ ได้แก่ หมายเลขทะเบียน, จังหวัด, ยี่ห้อ, รุ่น, ปีที่ผลิต, สี และหมายเลขตัวถัง (VIN)</p>
+<p class="bullet">• &nbsp; เชื่อมโยงความสัมพันธ์แบบหนึ่งต่อกลุ่ม (1:N) ระหว่างลูกค้าและยานพาหนะ โดยลูกค้า 1 รายสามารถครอบครองยานพาหนะได้มากกว่า 1 คัน</p>
+<p class="bullet">• &nbsp; แสดงประวัติการเข้ารับบริการย้อนหลังและรายการอะไหล่ที่เคยเปลี่ยนจำแนกตามคันรถ</p>
+<p class="numbered"><b>3.</b> <b>ระบบบริหารจัดการงานซ่อมและติดตามวงจรชีวิตงานบริการ (Repair Order Lifecycle Management Subsystem - FR-03):</b></p>
+<p class="bullet">• &nbsp; รองรับการสร้างใบรับรถ/ใบสั่งซ่อม (Repair Order) โดยระบุอาการเสีย, ช่างผู้รับผิดชอบ, ค่าแรงประเมิน, และการถ่ายภาพสภาพรถก่อนซ่อม (Before Photo)</p>
+<p class="bullet">• &nbsp; ควบคุมสถานะวงจรชีวิตงานซ่อม 7 ขั้นตอนมาตรฐาน:</p>
+<p class="numbered"><b>1.</b> `pending` (รอดำเนินการรับรถ)</p>
+<p class="numbered"><b>2.</b> `inspecting` (ตรวจสภาพและประเมินราคา)</p>
+<p class="numbered"><b>3.</b> `waiting_parts` (พักงานซ่อมชั่วคราวเพื่อรออะไหล่ / On-Hold)</p>
+<p class="numbered"><b>4.</b> `repairing` (กำลังปฏิบัติการซ่อมบำรุง)</p>
+<p class="numbered"><b>5.</b> `checking` (ทดสอบคุณภาพและตรวจสอบงานซ่อมขั้นสุดท้าย)</p>
+<p class="numbered"><b>6.</b> `ready` (งานซ่อมเสร็จสิ้น พร้อมส่งมอบยานพาหนะ)</p>
+<p class="numbered"><b>7.</b> `completed` (ชำระเงินและส่งมอบยานพาหนะเรียบร้อยแล้ว)</p>
+<p class="bullet">• &nbsp; มีสถานะพิเศษ `cancelled` (ยกเลิกงานซ่อม) ซึ่งระบบจะทำการคืนยอดตัดสต็อกอะไหล่กลับเข้าคลังอัตโนมัติ</p>
+<p class="bullet">• &nbsp; บันทึกภาพยานพาหนะหลังการซ่อมบำรุง (After Photo) และกำหนดวันสิ้นสุดการรับประกันงานซ่อม (Warranty Expiration Date)</p>
+<p class="bullet">• &nbsp; บันทึก Log ทุกการเปลี่ยนแปลงสถานะงานซ่อมพร้อมระบุชื่อผู้ดำเนินการและเวลาประทับ (Timestamp)</p>
+<p class="numbered"><b>4.</b> <b>ระบบบริหารจัดการคลังอะไหล่และจุดสั่งซื้อซ้ำ (Inventory Control and Reorder Point Subsystem - FR-04):</b></p>
+<p class="bullet">• &nbsp; บันทึกรายการอะไหล่, รหัสอะไหล่ (Part Number), หมวดหมู่, ราคาทุน, ราคาขาย, และข้อมูลผู้จัดจำหน่าย (Supplier)</p>
+<p class="bullet">• &nbsp; ตัดยอดสต็อกอะไหล่อัตโนมัติทันทีที่มีการผูกอะไหล่เข้ากับใบสั่งซ่อม</p>
+<p class="bullet">• &nbsp; ระบบแจ้งเตือนอะไหล่ใกล้หมดสต็อกเมื่อจำนวนคงเหลือลดลงต่ำกว่าหรือเท่ากับจุดสั่งซื้อซ้ำ (Reorder Point: `stock_qty <= min_qty`)</p>
+<p class="bullet">• &nbsp; ป้องกันการบันทึกเบิกอะไหล่กรณีสต็อกคงเหลือไม่เพียงพอ</p>
+<p class="numbered"><b>5.</b> <b>ระบบการเงิน การออกเอกสาร และรองรับการชำระเงินแบบหลายงวด (Billing, Invoicing, and Flexible Payment Subsystem - FR-05):</b></p>
+<p class="bullet">• &nbsp; คำนวณสรุปค่าใช้จ่ายรวมอัตโนมัติจาก: ค่าแรงช่าง + ราคาอะไหล่รวม + ภาษีมูลค่าเพิ่ม (VAT 7% กรณีเลือกคิดภาษี)</p>
+<p class="bullet">• &nbsp; ออกใบประเมินราคา (Quotation), ใบแจ้งหนี้ (Invoice) และใบเสร็จรับเงิน (Receipt) ในรูปแบบเอกสารมาตรฐาน</p>
+<p class="bullet">• &nbsp; สร้าง QR Code ชำระเงินมาตรฐาน พร้อมเพย์ (PromptPay Dynamic QR Code) ตามยอดหนี้จริงที่ต้องชำระ</p>
+<p class="bullet">• &nbsp; รองรับช่องทางการชำระเงิน: เงินสด (Cash), โอนผ่านธนาคาร (Bank Transfer), และสแกน QR Code</p>
+<p class="bullet">• &nbsp; รองรับระบบผ่อนชำระค่างวด (`installment`) โดยบันทึกเงื่อนไขและงวดการชำระหนี้</p>
+<p class="numbered"><b>6.</b> <b>ระบบรายงานสถิติและกระดานบริหารข้อมูลเชิงลึก (Executive Dashboard & Analytical Reporting - FR-06):</b></p>
+<p class="bullet">• &nbsp; แสดงตัวชี้วัดสำคัญทางธุรกิจแบบเรียลไทม์: รายรับ-รายจ่ายรวม, กำไรสุทธิ, จำนวนงานซ่อมที่กำลังดำเนินอยู่, จำนวนรถรอตรวจ</p>
+<p class="bullet">• &nbsp; แผนภูมิวิเคราะห์แนวโน้มยอดขายรายเดือน และ 5 อันดับงานซ่อม/อะไหล่ยอดนิยม</p>
+<p class="bullet">• &nbsp; ตัวกรองรายงานตามช่วงเวลา (รายวัน, รายสัปดาห์, รายเดือน, รายปี)</p>
+<p class="numbered"><b>7.</b> <b>ระบบบริการลูกค้าผ่านระบบสืบค้นตนเองและการแจ้งเตือนอัตโนมัติ (Customer Self-Service and LINE Integration - FR-07):</b></p>
+<p class="bullet">• &nbsp; ช่องทางหน้าเว็บสาธารณะ (Public Tracking Portal) ให้ลูกค้าตรวจสอบสถานะงานซ่อมได้ทันทีผ่านการกรอกเลขทะเบียนรถ</p>
+<p class="bullet">• &nbsp; ระบบแจ้งเตือนสถานะงานซ่อมผ่าน LINE Official Account ด้วยรูปแบบ LINE Flex Message อัตโนมัติเมื่อสถานะงานซ่อมเปลี่ยน</p>
+<p class="bullet">• &nbsp; ลูกค้าสามารถเปิดดูภาพถ่ายรถก่อน-หลังซ่อม รายการอะไหล่ และสแกนจ่ายเงินผ่าน LINE ได้ทันที</p>
+<p class="numbered"><b>8.</b> <b>ระบบลงเวลาปฏิบัติงานช่างด้วยคีออสก์รหัสคิวอาร์แบบพลวัต (Mechanic Dynamic QR Code Clock-In Kiosk - FR-08):</b></p>
+<p class="bullet">• &nbsp; เจ้าของอู่สามารถเปิดหน้าจอคีออสก์ (Kiosk Mode) บนคอมพิวเตอร์ประจำศูนย์ซ่อม เพื่อสร้าง QR Code เข้างาน</p>
+<p class="bullet">• &nbsp; รหัส QR Code ถูกสร้างขึ้นแบบพลวัต (Dynamic Rolling Token) โดยใช้อัลกอริทึมเข้ารหัสตามช่วงเวลา ซึ่งจะทำการผลัดเปลี่ยนใหม่ทุก ๆ 1 นาที (Time-based Rolling QR) ป้องกันการบันทึกภาพถ่ายไปแชร์หรือสแกนจากนอกสถานที่</p>
+<p class="bullet">• &nbsp; ช่างซ่อมใช้สมาร์ตโฟนสแกน QR Code จากหน้าจอคอมพิวเตอร์ เพื่อบันทึกเวลาเข้างาน (Clock-in) และเวลาออกงาน (Clock-out)</p>
+<p class="bullet">• &nbsp; หน้าจอช่างจะแสดงผลการยืนยันการเช็กอิน พร้อมระบุวันเวลาตามปฏิทินไทยและสถิติจำนวนวันทำงานสะสมในเดือนปัจจุบัน</p>
+<p class="bullet">• &nbsp; หน้าจอคีออสก์แสดงสถานะและรายชื่อช่างที่ทำการเช็กอินเข้างานแล้วแบบเรียลไทม์</p>
+<p class="numbered"><b>9.</b> <b>ระบบสำรองและกู้คืนฐานข้อมูล (Database Backup and System Maintenance - FR-09):</b></p>
+<p class="bullet">• &nbsp; ระบบสำรองข้อมูลฐานข้อมูล MySQL/MariaDB อัตโนมัติและแบบแมนนวล (One-Click Backup)</p>
+<p class="bullet">• &nbsp; ส่งออกไฟล์สำรองในรูปแบบ Structured Query Language (.sql) เพื่อความปลอดภัยของข้อมูล</p>
+<hr/>
+<h3>3.1.2 ความต้องการที่ไม่ใช่เชิงหน้าที่ (Non-Functional Requirements)</h3>
+<p class="numbered"><b>1.</b> <b>ประสิทธิภาพของระบบ (Performance):</b></p>
+<p class="bullet">• &nbsp; เวลาตอบสนองของระบบ (System Response Time) ในการโหลดหน้าเว็บแดชบอร์ดและรายการงานซ่อมไม่เกิน 2 วินาที ณ ปริมาณข้อมูลงานซ่อมสะสม 10,000 รายการ</p>
+<p class="bullet">• &nbsp; การสร้าง Dynamic QR Code คีออสก์และการประมวลผลการเช็กอินเข้างานใช้เวลาไม่เกิน 500 มิลลิวินาที</p>
+<p class="bullet">• &nbsp; การสืบค้นสถานะงานซ่อมผ่านหมายเลขทะเบียนรถตอบสนองผลลัพธ์ภายในเวลาไม่เกิน 1 วินาที</p>
+<p class="numbered"><b>2.</b> <b>ความมั่นคงปลอดภัยของสารสนเทศ (Security):</b></p>
+<p class="bullet">• &nbsp; รหัสผ่านของผู้ใช้งานทุกคนต้องผ่านการเข้ารหัสแบบทางเดียวด้วยอัลกอริทึม Bcrypt ที่มี Salt Rounds ไม่น้อยกว่า 10</p>
+<p class="bullet">• &nbsp; จัดการเซสชันการเข้าใช้งานด้วย HTTP-Only Cookies พร้อมกำหนดอายุการใช้งานของเซสชัน (Session Timeout)</p>
+<p class="bullet">• &nbsp; การลงเวลาปฏิบัติงานผ่าน Dynamic QR Code ใช้การเข้ารหัสค่าโทเคนด้วย HMAC SHA-256 ผนวกกับ Timestamp เพื่อป้องกันการดักจับและทำซ้ำ (Replay Attack)</p>
+<p class="bullet">• &nbsp; การสืบค้นฐานข้อมูลทั้งหมดเขียนผ่าน Prepared Statements เพื่อป้องกันช่องโหว่ SQL Injection</p>
+<p class="bullet">• &nbsp; ตรวจสอบและกรองประเภทไฟล์ภาพถ่ายรถยนต์ก่อนอัปโหลด ป้องกันช่องโหว่ Arbitrary File Upload</p>
+<p class="numbered"><b>3.</b> <b>ความง่ายในการใช้งานและความสามารถในการปรับขนาดหน้าจอ (Usability & Responsiveness):</b></p>
+<p class="bullet">• &nbsp; ส่วนประสานผู้ใช้งานได้รับการออกแบบตามหลัก Mobile-First และ Fluid Responsive Design รองรับการแสดงผลบนคอมพิวเตอร์ตั้งโต๊ะ, แท็บเล็ตช่าง (Tablet), และสมาร์ตโฟน (Mobile Phone)</p>
+<p class="bullet">• &nbsp; เมนูและสัญลักษณ์ถูกจัดหมวดหมู่ให้เข้าใจง่าย ลดขั้นตอนการคลิกเพื่อบันทึกงานซ่อมไม่เกิน 3 คลิก</p>
+<p class="numbered"><b>4.</b> <b>ความน่าเชื่อถือและความพร้อมใช้งาน (Reliability & Availability):</b></p>
+<p class="bullet">• &nbsp; ระบบสามารถให้บริการต่อเนื่องได้ตลอด 24 ชั่วโมงต่อวัน 7 วันต่อสัปดาห์ (24/7 Availability)</p>
+<p class="bullet">• &nbsp; รองรับการทำ Atomic Database Transactions สำหรับการสร้างงานซ่อมและตัดสต็อก เพื่อป้องกันภาวะข้อมูลขัดแย้ง (Data Inconsistency) เมื่อเกิดข้อผิดพลาดระหว่างทำงาน</p>
+<hr/>
+<h2>3.2 การวิเคราะห์และการออกแบบภาพรวมของระบบบริหารจัดการอู่ซ่อมบำรุงยานยนต์</h2>
+<h3>3.2.1 สถาปัตยกรรมภาพรวมของระบบ (System Architecture)</h3>
+<p>สถาปัตยกรรมของระบบบริหารจัดการอู่ซ่อมบำรุงยานยนต์ได้รับการออกแบบตามรูปแบบ <b>3-Tier Model-View-Controller (MVC) Architecture</b> เพื่อแยกส่วนการประมวลผลและการจัดเก็บข้อมูลออกจากกันอย่างเป็นอิสระ ส่งผลให้ระบบมีความยืดหยุ่นสูง ง่ายต่อการบำรุงรักษาและขยายขีดความสามารถในอนาคต</p>
+<div class="code-box">graph TD
+    subgraph ClientTier [&quot;1. ส่วนติดต่อผู้ใช้ (Presentation Tier / Client Tier)&quot;]
+        A1[&quot;คอมพิวเตอร์ประจำอู่ / จอคีออสก์&lt;br&gt;(Desktop Web Browser)&quot;]
+        A2[&quot;สมาร์ตโฟนช่างซ่อมบำรุง&lt;br&gt;(Mobile Device / Tablet)&quot;]
+        A3[&quot;ลูกค้าผู้รับบริการ&lt;br&gt;(Public Web &amp; LINE OA)&quot;]
+    end
+
+    subgraph AppTier [&quot;2. ส่วนประมวลผลตรรกะระบบ (Application Tier / Node.js Express)&quot;]
+        B1[&quot;Reverse Proxy / Web Server&quot;]
+        B2[&quot;Security &amp; Authentication Middleware&lt;br&gt;(Bcrypt, Express Session, HMAC Token)&quot;]
+        B3[&quot;MVC Controller Core&lt;br&gt;(Repair, Inventory, Finance, Attendance, Customer)&quot;]
+        B4[&quot;External Service Connectors&lt;br&gt;(LINE Messaging API, PromptPay QR Generator)&quot;]
+    end
+
+    subgraph DataTier [&quot;3. ส่วนบริหารจัดการฐานข้อมูลและไฟล์ (Data Tier)&quot;]
+        C1[(&quot;ฐานข้อมูลเชิงสัมพันธ์&lt;br&gt;MariaDB / MySQL Database&quot;)]
+        C2[&quot;แฟ้มจัดเก็บไฟล์ภาพถ่าย&lt;br&gt;(Local Static Storage / Uploads)&quot;]
+    end
+
+    ClientTier --&gt;|HTTPS / REST Request| AppTier
+    AppTier --&gt;|SQL Queries / Prepared Statements| C1
+    AppTier --&gt;|File Read / Write Stream| C2</div>
+<p class="bullet">• &nbsp; <b>Presentation Tier:</b> นำเสนอส่วนติดต่อผู้ใช้ด้วย Embedded JavaScript Templates (EJS) ร่วมกับ Tailwind CSS และ JavaScript ฝั่งไคลเอนต์ รองรับการโต้ตอบแบบเรียลไทม์</p>
+<p class="bullet">• &nbsp; <b>Application Tier:</b> ขับเคลื่อนด้วย Node.js และ Express.js ทำหน้าที่ควบคุมเส้นทาง (Routing) ตรวจสอบความถูกต้องของข้อมูล ควบคุมสิทธิ์การเข้าถึง และประมวลผลคำนวณทางธุรกิจ</p>
+<p class="bullet">• &nbsp; <b>Data Tier:</b> จัดเก็บข้อมูลอย่างเป็นระบบด้วยระบบจัดการฐานข้อมูล MariaDB/MySQL และจัดเก็บภาพถ่ายยานพาหนะบนหน่วยความจำของเซิร์ฟเวอร์</p>
+<hr/>
+<h3>3.2.2 ผังลำดับขั้นตอนการปฏิบัติงานรวมของสถานประกอบการ (Workshop System Flowchart)</h3>
+<p>วงจรการปฏิบัติงานซ่อมบำรุงภายในอู่ยานยนต์ถูกจำลองขั้นตอนการทำงานตั้งแต่เริ่มต้นรับรถจนกระทั่งส่งมอบยานพาหนะและปิดงานซ่อมบำรุง ดังแสดงในผังงานต่อไปนี้:</p>
+<div class="code-box">flowchart TD
+    Start([เริ่มต้น: ลูกค้านำรถเข้ามารับบริการ]) --&gt; Step1[1. ลงทะเบียนลูกค้า ยานพาหนะ และเปิดใบรับรถใหม่&lt;br&gt;สถานะ: pending]
+    Step1 --&gt; Step2[2. ช่างทำการตรวจสภาพรถเบื้องต้น ถ่ายภาพ และประเมินราคา&lt;br&gt;สถานะ: inspecting]
+    Step2 --&gt; CheckApprove{ลูกค้าเห็นชอบ&lt;br&gt;การประเมินราคา?}
+    
+    CheckApprove -- ไม่อนุมัติ --&gt; Cancelled[ลูกค้ายกเลิกการซ่อม&lt;br&gt;สถานะ: cancelled] --&gt; End([สิ้นสุดขั้นตอน])
+    CheckApprove -- อนุมัติ --&gt; CheckStock{ตรวจสอบอะไหล่&lt;br&gt;ในคลังสินค้า}
+    
+    CheckStock -- อะไหล่ไม่พอ --&gt; Step3[3. สั่งซื้อและพักงานซ่อมชั่วคราว&lt;br&gt;สถานะ: waiting_parts]
+    Step3 --&gt; Restock[รับอะไหล่เข้าคลังและจัดสรร] --&gt; Step4
+    
+    CheckStock -- อะไหล่พร้อมใช้งาน --&gt; Step4[4. เบิกอะไหล่ ตัดสต็อกอัตโนมัติ และเริ่มซ่อมบำรุง&lt;br&gt;สถานะ: repairing]
+    Step4 --&gt; Step5[5. ซ่อมเสร็จสิ้น ทดสอบสมรรถนะ และตรวจสอบคุณภาพ&lt;br&gt;สถานะ: checking]
+    
+    Step5 --&gt; CheckPass{ผ่านการตรวจสอบ&lt;br&gt;มาตรฐานหรือไม่?}
+    CheckPass -- ไม่ผ่าน --&gt; Step4
+    CheckPass -- ผ่าน --&gt; Step6[6. บันทึกภาพหลังซ่อม และแจ้งเตือนลูกค้าพร้อมรับรถ&lt;br&gt;สถานะ: ready]
+    
+    Step6 --&gt; Step7[7. ลูกค้าตรวจรับรถ ชำระเงิน และส่งมอบกุญแจ&lt;br&gt;สถานะ: completed]
+    Step7 --&gt; Warranty[ออกใบเสร็จรับเงิน และเริ่มนับระยะเวลารับประกัน]
+    Warranty --&gt; End</div>
+<hr/>
+<h3>3.2.3 แผนภาพกรณีการใช้งาน (Use Case Diagram)</h3>
+<p>การวิเคราะห์กรณีการใช้งานกำหนดบทบาทผู้ใช้งาน (Actors) ออกเป็น 3 บทบาทหลักที่สะท้อนถึงการปฏิบัติงานจริงในศูนย์บริการ ได้แก่:</p>
+<p class="numbered"><b>1.</b> <b>เจ้าของอู่ / ผู้ดูแลระบบ (Workshop Owner / Administrator)</b></p>
+<p class="numbered"><b>2.</b> <b>ช่างซ่อมบำรุง (Mechanic / Technician)</b></p>
+<p class="numbered"><b>3.</b> <b>ลูกค้าผู้รับบริการ (Customer)</b></p>
+<div class="code-box">graph LR
+    subgraph Actors [&quot;ผู้มีส่วนร่วมในระบบ (Actors)&quot;]
+        Owner((&quot;เจ้าของอู่ / แอดมิน&lt;br&gt;(Owner / Admin)&quot;))
+        Mechanic((&quot;ช่างซ่อมบำรุง&lt;br&gt;(Mechanic)&quot;))
+        Customer((&quot;ลูกค้าผู้รับบริการ&lt;br&gt;(Customer)&quot;))
+    end
+
+    subgraph WorkshopSystem [&quot;ระบบบริหารจัดการอู่ซ่อมบำรุงยานยนต์ (Workshop System)&quot;]
+        UC01[&quot;เข้าสู่ระบบ / ออกจากระบบ (Login/Logout)&quot;]
+        UC02[&quot;จัดการข้อมูลผู้ใช้และสิทธิ์ (Manage Users)&quot;]
+        UC03[&quot;เปิดหน้าจอคีออสก์ QR ลงเวลา (Open Clock-in Kiosk)&quot;]
+        UC04[&quot;สแกน QR บันทึกเวลาเข้า-ออกงาน (Scan Dynamic QR Clock-in)&quot;]
+        UC05[&quot;จัดการข้อมูลลูกค้าและยานพาหนะ (Manage Customers &amp; Vehicles)&quot;]
+        UC06[&quot;สร้างและแก้ไขใบสั่งซ่อม (Create / Edit Repair Order)&quot;]
+        UC07[&quot;อัปเดตสถานะงานซ่อม 7 ขั้นตอน (Update Repair Status)&quot;]
+        UC08[&quot;เบิกอะไหล่และจัดการสต็อก (Manage Parts &amp; Stock)&quot;]
+        UC09[&quot;ออกบิลและบันทึกการชำระเงิน (Invoicing &amp; Payments)&quot;]
+        UC10[&quot;ดูรายงานสถิติและกระดานวิเคราะห์ (View Analytical Dashboard)&quot;]
+        UC11[&quot;สำรองและกู้คืนฐานข้อมูล (Database Backup)&quot;]
+        UC12[&quot;ติดตามสถานะงานซ่อมผ่านหน้าเว็บ (Track Repair by License Plate)&quot;]
+        UC13[&quot;รับการแจ้งเตือนงานซ่อมผ่าน LINE (Receive Notifications via LINE)&quot;]
+    end
+
+    Owner --&gt; UC01
+    Owner --&gt; UC02
+    Owner --&gt; UC03
+    Owner --&gt; UC05
+    Owner --&gt; UC06
+    Owner --&gt; UC07
+    Owner --&gt; UC08
+    Owner --&gt; UC09
+    Owner --&gt; UC10
+    Owner --&gt; UC11
+
+    Mechanic --&gt; UC01
+    Mechanic --&gt; UC04
+    Mechanic --&gt; UC06
+    Mechanic --&gt; UC07
+    Mechanic --&gt; UC08
+
+    Customer --&gt; UC12
+    Customer --&gt; UC13</div>
+<hr/>
+<h3>3.2.4 ตารางคำอธิบายกรณีการใช้งาน (Use Case Description)</h3>
+<h4>ตารางที่ 3.1 คำอธิบายกรณีการใช้งาน: การเปิดหน้าจอคีออสก์และการสแกนบันทึกเวลาเข้างาน (UC-04 &amp; UC-03)</h4>
+<table><thead><tr><th>รหัสกรณีการใช้งาน</th><th>UC-03 &amp; UC-04</th></tr></thead><tbody><tr><td><b>ชื่อกรณีการใช้งาน</b></td><td>การเปิดคีออสก์สร้างรหัสพลวัตและการสแกนลงเวลาปฏิบัติงาน (Dynamic QR Attendance)</td></tr><tr><td><b>ผู้กระทำหลัก</b></td><td>เจ้าของอู่ (เปิดหน้าจอคีออสก์) และ ช่างซ่อมบำรุง (ผู้สแกนเช็กอิน)</td></tr><tr><td><b>เงื่อนไขก่อนเริ่ม</b></td><td>1. เจ้าของอู่เข้าสู่ระบบและเปิดหน้าจอ Kiosk Mode บนหน้าจอคอมพิวเตอร์ประจำอู่<br>2. ช่างซ่อมบำรุงมีบัญชีผู้ใช้ในระบบและเปิดเว็บแอปพลิเคชันบนสมาร์ตโฟน</td></tr><tr><td><b>ผลลัพธ์ที่ได้</b></td><td>ข้อมูลเวลาเข้างานหรือออกงานของช่างถูกบันทึกลงฐานข้อมูล พร้อมสรุปวันทำงานสะสมในเดือนปัจจุบัน</td></tr><tr><td><b>ลำดับเหตุการณ์ปกติ</b></td><td>1. เจ้าของอู่เปิดหน้าต่าง `/attendance/qr-kiosk`<br>2. ระบบสร้าง QR Code พลวัตด้วยรหัสโทเคน HMAC-Timestamp ที่จะเปลี่ยนใหม่ทุก ๆ 60 วินาที<br>3. ช่างซ่อมบำรุงนำสมาร์ตโฟนสแกน QR Code บนหน้าจอคอมพิวเตอร์<br>4. ระบบตรวจสอบความถูกต้องของโทเคนและช่วงเวลา (Time-window verification)<br>5. ระบบตรวจสอบเงื่อนไขเวลา: หากสแกนครั้งแรกของวันบันทึกเป็น `clock_in` หากสแกนซ้ำบันทึกเป็น `clock_out`<br>6. ระบบส่งผลตอบกลับแสดงบัตรข้อมูลความสำเร็จ วันที่ภาษาไทย และจำนวนวันเข้าทำงานในเดือน<br>7. หน้าจอคีออสก์ของอู่แสดงชื่อช่างที่เพิ่งลงเวลาสำเร็จทันทีโดยไม่ต้องรีเฟรชหน้าจอ</td></tr><tr><td><b>เหตุการณ์ทางเลือก</b></td><td>4a. โทเคนหมดอายุ (เกิน 60 วินาที): ระบบแสดงข้อความแจ้งเตือน "QR Code หมดอายุแล้ว กรุณาสแกนรหัสใหม่จากหน้าจอ"<br>4b. ข้อมูลผู้ใช้ไม่ถูกต้อง: ระบบปฏิเสธการบันทึกและแจ้งให้เข้าสู่ระบบใหม่</td></tr></tbody></table>
+<hr/>
+<h4>ตารางที่ 3.2 คำอธิบายกรณีการใช้งาน: การสร้างใบสั่งซ่อมและการอัปเดตสถานะงานซ่อม (UC-06 &amp; UC-07)</h4>
+<table><thead><tr><th>รหัสกรณีการใช้งาน</th><th>UC-06 &amp; UC-07</th></tr></thead><tbody><tr><td><b>ชื่อกรณีการใช้งาน</b></td><td>การสร้างใบสั่งซ่อมและควบคุมวงจรชีวิตงานซ่อม (Repair Order Management)</td></tr><tr><td><b>ผู้กระทำหลัก</b></td><td>เจ้าของอู่, ช่างซ่อมบำรุง</td></tr><tr><td><b>เงื่อนไขก่อนเริ่ม</b></td><td>ยานพาหนะและข้อมูลลูกค้าได้รับการลงทะเบียนในระบบเรียบร้อยแล้ว</td></tr><tr><td><b>ผลลัพธ์ที่ได้</b></td><td>ใบสั่งซ่อมถูกบันทึกลงฐานข้อมูล ข้อมูลถูกส่งต่อไปยังช่าง และแจ้งเตือนลูกค้าทาง LINE</td></tr><tr><td><b>ลำดับเหตุการณ์ปกติ</b></td><td>1. ผู้ใช้เลือกคันรถที่ต้องการเปิดงานซ่อม และระบุอาการเสียเบื้องต้น<br>2. อัปโหลดภาพถ่ายสภาพรถก่อนเริ่มซ่อม (Before Photo)<br>3. ช่างซ่อมบำรุงตรวจสอบสภาพ เปลี่ยนสถานะเป็น `inspecting` และประเมินราคา<br>4. เมื่อลูกค้าอนุมัติ ช่างเบิกอะไหล่ ระบบตัดสต็อกอัตโนมัติ และเปลี่ยนสถานะเป็น `repairing`<br>5. เมื่องานซ่อมเสร็จ เปลี่ยนสถานะเป็น `checking` และ `ready` พร้อมแนบรูปถ่ายหลังซ่อม (After Photo)<br>6. ระบบยิงข้อความ LINE Flex Message แจ้งเตือนลูกค้าอัตโนมัติ<br>7. ลูกค้าชำระเงินและรับรถ เจ้าของอู่เปลี่ยนสถานะเป็น `completed` เพื่อปิดงาน</td></tr><tr><td><b>เหตุการณ์ทางเลือก</b></td><td>4a. อะไหล่ในคลังมีไม่เพียงพอ: ระบบเปลี่ยนสถานะเป็น `waiting_parts` เพื่อรอการจัดซื้อ<br>4b. ลูกค้ายกเลิกงานซ่อม: เจ้าของอู่เปลี่ยนสถานะเป็น `cancelled` ระบบจะคืนยอดอะไหล่ที่เบิกไว้กลับเข้าสู่สต็อกโดยอัตโนมัติ</td></tr></tbody></table>
+<hr/>
+<h2>3.3 การออกแบบเว็บแอปพลิเคชันส่วนหน้าบ้านและส่วนหลังบ้าน</h2>
+<h3>3.3.1 การออกแบบเว็บแอปพลิเคชันส่วนหน้าบ้าน (Frontend System Design)</h3>
+<p>การออกแบบโครงสร้างการไหลเวียนของข้อมูลจำลองผ่านแผนภาพกระแสข้อมูล (Data Flow Diagram: DFD) ตั้งแต่ระดับภาพรวมบริบทไปจนถึงระดับกระบวนการย่อย</p>
+<h4>1) แผนภาพบริบท (Context Diagram)</h4>
+<p>แผนภาพบริบทแสดงปฏิสัมพันธ์ระหว่างระบบบริหารจัดการอู่ซ่อมบำรุงยานยนต์กับเอนทิตีภายนอก (External Entities) ทั้ง 4 ส่วน</p>
+<div class="code-box">graph TD
+    System[&quot;ระบบบริหารจัดการอู่ซ่อมบำรุงยานยนต์&lt;br&gt;(Automotive Workshop Management System)&quot;]
+    
+    Admin[&quot;เจ้าของอู่ / ผู้ดูแลระบบ&lt;br&gt;(Owner / Admin)&quot;]
+    Mechanic[&quot;ช่างซ่อมบำรุง&lt;br&gt;(Mechanic)&quot;]
+    Customer[&quot;ลูกค้าผู้รับบริการ&lt;br&gt;(Customer)&quot;]
+    External[&quot;ระบบภายนอก&lt;br&gt;(LINE Platform &amp; Bank API)&quot;]
+
+    Admin --&gt;|ข้อมูลผู้ใช้, สิทธิ์, ราคา, สต็อก, การตั้งค่า| System
+    System --&gt;|รายงานการเงิน, รายการแจ้งเตือนสต็อก, สถิติคีออสก์| Admin
+
+    Mechanic --&gt;|บันทึกการซ่อม, เบิกอะไหล่, สแกน QR เข้างาน| System
+    System --&gt;|รายการงานซ่อมที่ได้รับมอบหมาย, สถานะเช็กอิน| Mechanic
+
+    Customer --&gt;|หมายเลขทะเบียนรถสำหรับสืบค้น, หลักฐานโอนเงิน| System
+    System --&gt;|ผลการตรวจเช็ก, ภาพรถ, ใบแจ้งหนี้, Dynamic QR| Customer
+
+    System --&gt;|ข้อมูลข้อความแจ้งเตือน Flex Message| External
+    External --&gt;|สถานะการส่งข้อความ, ข้อมูลยืนยันการโอน| System</div>
+<hr/>
+<h4>2) แผนภาพกระแสข้อมูลระดับที่ 0 (Data Flow Diagram Level 0)</h4>
+<p>DFD Level 0 จำแนกการทำงานออกเป็น 9 กระบวนการหลักที่สอดคล้องกับโครงสร้างโมดูลของระบบ:</p>
+<div class="code-box">graph TD
+    E1[&quot;เจ้าของอู่ / แอดมิน&quot;]
+    E2[&quot;ช่างซ่อมบำรุง&quot;]
+    E3[&quot;ลูกค้า&quot;]
+    E4[&quot;LINE API / PromptPay&quot;]
+
+    D1[(&quot;D1: ผู้ใช้งาน (users)&quot;)]
+    D2[(&quot;D2: ลูกค้า (customers)&quot;)]
+    D3[(&quot;D3: ยานพาหนะ (vehicles)&quot;)]
+    D4[(&quot;D4: งานซ่อม (repairs)&quot;)]
+    D5[(&quot;D5: คลังอะไหล่ (inventory)&quot;)]
+    D6[(&quot;D6: การเงิน (finances)&quot;)]
+    D7[(&quot;D7: บันทึกลงเวลา (attendances)&quot;)]
+    D8[(&quot;D8: ปูมระบบ (audit_logs)&quot;)]
+
+    P1[&quot;1.0&lt;br&gt;การพิสูจน์สิทธิ์และ&lt;br&gt;จัดการผู้ใช้&quot;]
+    P2[&quot;2.0&lt;br&gt;จัดการข้อมูลลูกค้า&lt;br&gt;และยานพาหนะ&quot;]
+    P3[&quot;3.0&lt;br&gt;จัดการวงจรชีวิต&lt;br&gt;งานซ่อมบำรุง&quot;]
+    P4[&quot;4.0&lt;br&gt;บริหารคลังและ&lt;br&gt;เบิกจ่ายอะไหล่&quot;]
+    P5[&quot;5.0&lt;br&gt;การเงิน ใบเสร็จ&lt;br&gt;และชำระเงิน&quot;]
+    P6[&quot;6.0&lt;br&gt;ออกรายงานและ&lt;br&gt;แดชบอร์ด&quot;]
+    P7[&quot;7.0&lt;br&gt;บริการสืบค้นและ&lt;br&gt;แจ้งเตือนลูกค้า&quot;]
+    P8[&quot;8.0&lt;br&gt;คีออสก์และลงเวลา&lt;br&gt;ปฏิบัติงานช่าง&quot;]
+    P9[&quot;9.0&lt;br&gt;สำรองและกู้คืน&lt;br&gt;ฐานข้อมูล&quot;]
+
+    E1 --&gt;|ชื่อผู้ใช้/รหัสผ่าน| P1
+    P1 --&gt; D1
+    P1 --&gt; D8
+
+    E1 --&gt;|ข้อมูลลูกค้า/รถ| P2
+    P2 --&gt; D2
+    P2 --&gt; D3
+
+    E1 &amp; E2 --&gt;|ข้อมูลงานซ่อม/ภาพถ่าย| P3
+    P3 --&gt; D4
+    P3 --&gt; D8
+
+    E2 --&gt;|ขอเบิกอะไหล่| P4
+    P4 &lt;--&gt; D5
+    P4 --&gt;|ตัดยอดสต็อก| D4
+
+    E1 --&gt;|บันทึกการชำระเงิน/ค่างวด| P5
+    P5 --&gt; D6
+    P5 --&gt;|PromptPay QR| E3
+
+    D4 &amp; D5 &amp; D6 --&gt; P6
+    P6 --&gt;|กราฟสรุปและรายงาน| E1
+
+    E3 --&gt;|สืบค้นทะเบียนรถ| P7
+    D4 &amp; D3 --&gt; P7
+    P7 --&gt;|แจ้งเตือน Flex Message| E4
+    E4 --&gt;|ส่งแจ้งเตือน| E3
+
+    E1 --&gt;|เปิดคีออสก์ QR| P8
+    E2 --&gt;|สแกนโทเคนเข้างาน| P8
+    P8 --&gt; D7
+    P8 --&gt;|ยืนยันผลเช็กอิน| E2
+
+    E1 --&gt;|สั่งสำรองข้อมูล| P9
+    D1 &amp; D2 &amp; D3 &amp; D4 &amp; D5 &amp; D6 &amp; D7 --&gt; P9
+    P9 --&gt;|ไฟล์ .sql สำรอง| E1</div>
+<hr/>
+<h4>3) แผนภาพกระแสข้อมูลระดับที่ 1 (Data Flow Diagram Level 1)</h4>
+<p>##### กระบวนการย่อย 3.0: ระบบจัดการวงจรชีวิตงานซ่อมบำรุง (Repair Order Management Subsystem)</p>
+<div class="code-box">graph TD
+    Mechanic[&quot;ช่างซ่อมบำรุง / แอดมิน&quot;]
+    D_Vehicles[(&quot;D3: vehicles&quot;)]
+    D_Repairs[(&quot;D4: repairs&quot;)]
+    D_Logs[(&quot;D4.1: repair_logs&quot;)]
+    D_Parts[(&quot;D4.2: repair_parts&quot;)]
+    D_Stock[(&quot;D5: inventory&quot;)]
+
+    P3_1[&quot;3.1 บันทึกเปิดใบสั่งซ่อมและตรวจรับสภาพรถ&quot;]
+    P3_2[&quot;3.2 ประเมินค่าแรงและระบุรายการอะไหล่&quot;]
+    P3_3[&quot;3.3 ตัดสต็อกอะไหล่และเริ่มงานซ่อม&quot;]
+    P3_4[&quot;3.4 ตรวจสอบคุณภาพงานและบันทึกภาพหลังซ่อม&quot;]
+    P3_5[&quot;3.5 ปิดงานซ่อมหรือจัดการกรณียกเลิกงาน&quot;]
+
+    Mechanic --&gt;|เลือกรถ, อาการ, ภาพ Before| P3_1
+    P3_1 --&gt; D_Vehicles
+    P3_1 --&gt; D_Repairs
+
+    Mechanic --&gt;|ระบุค่าแรง, เลือกอะไหล่| P3_2
+    P3_2 --&gt; D_Parts
+
+    P3_2 --&gt; P3_3
+    P3_3 --&gt;|ตัดยอดคงคลัง| D_Stock
+    P3_3 --&gt;|อัปเดตสถานะ repairing| D_Repairs
+    P3_3 --&gt;|บันทึกประวัติ| D_Logs
+
+    Mechanic --&gt;|บันทึกภาพ After, ผลตรวจ| P3_4
+    P3_4 --&gt;|อัปเดตสถานะ ready| D_Repairs
+    P3_4 --&gt;|บันทึกประวัติ| D_Logs
+
+    Mechanic --&gt;|ส่งมอบรถ / ยกเลิก| P3_5
+    P3_5 --&gt;|อัปเดต completed หรือ cancelled| D_Repairs
+    P3_5 --&gt;|กรณี cancelled คืนสต็อก| D_Stock</div>
+<p>##### กระบวนการย่อย 8.0: ระบบคีออสก์และลงเวลาปฏิบัติงานช่าง (Dynamic QR Attendance Subsystem)</p>
+<div class="code-box">graph TD
+    Admin[&quot;เจ้าของอู่&quot;]
+    Mechanic[&quot;ช่างซ่อมบำรุง&quot;]
+    D_User[(&quot;D1: users&quot;)]
+    D_Att[(&quot;D7: attendances&quot;)]
+
+    P8_1[&quot;8.1 สร้างโทเคนพลวัตตามเวลา (HMAC Rolling Token)&quot;]
+    P8_2[&quot;8.2 เรนเดอร์จอคีออสก์และนับถอยหลัง 60 วิ&quot;]
+    P8_3[&quot;8.3 ตรวจสอบความถูกต้องของโทเคนและเซสชัน&quot;]
+    P8_4[&quot;8.4 บันทึกเวลาเข้า-ออกงาน (Clock In / Clock Out)&quot;]
+    P8_5[&quot;8.5 คำนวณสรุปวันเข้างานรายเดือนและแสดงผล&quot;]
+
+    Admin --&gt;|เรียกหน้าคีออสก์| P8_1
+    P8_1 --&gt; P8_2
+    P8_2 --&gt;|แสดง Dynamic QR บนจอคอมพิวเตอร์| Mechanic
+
+    Mechanic --&gt;|ใช้สมาร์ตโฟนสแกนส่งค่า Token| P8_3
+    P8_3 --&gt; D_User
+    P8_3 --&gt;|โทเคนถูกต้อง| P8_4
+
+    P8_4 --&gt;|ตรวจสอบการสแกนในวัน| D_Att
+    P8_4 --&gt; P8_5
+    P8_5 --&gt;|แสดงบัตรยืนยัน วันที่ไทย และยอดวันทำงาน| Mechanic
+    P8_5 --&gt;|อัปเดตรายชื่อช่างที่มาทำงานบนจอคีออสก์| Admin</div>
+<hr/>
+<h3>3.3.2 การออกแบบเว็บแอปพลิเคชันส่วนหลังบ้าน (Backend System Design)</h3>
+<h4>1) แบบจำลองความสัมพันธ์ของข้อมูลเชิงกายภาพ (Physical ER-Diagram)</h4>
+<p>ฐานข้อมูลของระบบพัฒนาบนสถาปัตยกรรมเชิงสัมพันธ์ (Relational Database) มีโครงสร้างความสัมพันธ์ระหว่างตารางดังนี้:</p>
+<div class="code-box">erDiagram
+    users ||--o{ repairs : &quot;assigned_to&quot;
+    users ||--o{ attendances : &quot;records&quot;
+    users ||--o{ audit_logs : &quot;triggers&quot;
+    users ||--o{ repair_logs : &quot;updates&quot;
+
+    customers ||--o{ vehicles : &quot;owns&quot;
+    customers ||--o{ repairs : &quot;requests&quot;
+
+    vehicles ||--o{ repairs : &quot;undergoes&quot;
+
+    repairs ||--o{ repair_parts : &quot;contains&quot;
+    repairs ||--o{ repair_logs : &quot;tracks&quot;
+    repairs ||--o{ finances : &quot;generates&quot;
+
+    inventory ||--o{ repair_parts : &quot;supplies&quot;
+
+    users {
+        int id PK
+        varchar username UK
+        varchar password
+        varchar fullname
+        enum role &quot;owner, mechanic&quot;
+        varchar phone
+        varchar skills
+        enum status &quot;active, inactive&quot;
+        datetime created_at
+    }
+
+    customers {
+        int id PK
+        varchar fullname
+        varchar phone
+        varchar email
+        text address
+        varchar line_id
+        datetime created_at
+    }
+
+    vehicles {
+        int id PK
+        int customer_id FK
+        varchar license_plate
+        varchar brand
+        varchar model
+        int year
+        varchar color
+        varchar vin
+        datetime created_at
+    }
+
+    repairs {
+        int id PK
+        int vehicle_id FK
+        int customer_id FK
+        int mechanic_id FK
+        text description
+        enum status &quot;pending, inspecting, waiting_parts, repairing, checking, ready, completed, cancelled&quot;
+        decimal estimated_cost
+        decimal actual_cost
+        varchar car_photo_before
+        varchar car_photo_after
+        date warranty_expire_date
+        datetime created_at
+        datetime updated_at
+    }
+
+    inventory {
+        int id PK
+        varchar part_name
+        varchar part_number UK
+        varchar category
+        int stock_qty
+        int min_qty
+        decimal cost_price
+        decimal sell_price
+        varchar supplier
+        datetime updated_at
+    }
+
+    repair_parts {
+        int id PK
+        int repair_id FK
+        int part_id FK
+        int quantity
+        decimal sell_price
+    }
+
+    repair_logs {
+        int id PK
+        int repair_id FK
+        enum status
+        text notes
+        int updated_by FK
+        datetime created_at
+    }
+
+    finances {
+        int id PK
+        int repair_id FK
+        enum type &quot;income, expense&quot;
+        decimal amount
+        enum payment_method &quot;cash, transfer, qr&quot;
+        enum status &quot;pending, paid, cancelled, installment&quot;
+        text installment_terms
+        text description
+        datetime transaction_date
+    }
+
+    attendances {
+        int id PK
+        int user_id FK
+        date work_date
+        time clock_in
+        time clock_out
+        enum status &quot;present, late, leave_sick, leave_business, leave_vacation, absent&quot;
+        text notes
+        datetime created_at
+    }
+
+    audit_logs {
+        int id PK
+        int user_id FK
+        varchar action
+        text details
+        datetime created_at
+    }
+
+    settings {
+        int id PK
+        varchar setting_key UK
+        text setting_value
+        datetime updated_at
+    }</div>
+<hr/>
+<h4>2) พจนานุกรมข้อมูล (Data Dictionary)</h4>
+<p>##### ตารางที่ 3.3: ตารางข้อมูลผู้ใช้งานระบบ (users)</p>
+<table><thead><tr><th>ชื่อคอลัมน์ (Field)</th><th>ชนิดข้อมูล (Data Type)</th><th>คีย์ (Key)</th><th>ค่าว่าง (Null)</th><th>คำอธิบาย (Description)</th></tr></thead><tbody><tr><td>`id`</td><td>INT AUTO_INCREMENT</td><td>PK</td><td>NO</td><td>รหัสประจำตัวผู้ใช้งาน</td></tr><tr><td>`username`</td><td>VARCHAR(50)</td><td>UK</td><td>NO</td><td>ชื่อบัญชีผู้ใช้งานสำหรับเข้าสู่ระบบ</td></tr><tr><td>`password`</td><td>VARCHAR(255)</td><td>-</td><td>NO</td><td>รหัสผ่านที่เข้ารหัสผ่าน Bcrypt Hashing</td></tr><tr><td>`fullname`</td><td>VARCHAR(100)</td><td>-</td><td>NO</td><td>ชื่อ-นามสกุลจริงของผู้ใช้งาน</td></tr><tr><td>`role`</td><td>ENUM('owner','mechanic')</td><td>-</td><td>NO</td><td>บทบาทสิทธิ์การใช้งาน (เจ้าของอู่ หรือ ช่าง)</td></tr><tr><td>`phone`</td><td>VARCHAR(20)</td><td>-</td><td>YES</td><td>หมายเลขโทรศัพท์ติดต่อ</td></tr><tr><td>`skills`</td><td>VARCHAR(255)</td><td>-</td><td>YES</td><td>ความเชี่ยวชาญเฉพาะทางของช่างซ่อม</td></tr><tr><td>`status`</td><td>ENUM('active','inactive')</td><td>-</td><td>NO</td><td>สถานะการทำงานของบัญชี (ค่าเริ่มต้น 'active')</td></tr><tr><td>`created_at`</td><td>DATETIME</td><td>-</td><td>NO</td><td>วันที่และเวลาที่บันทึกข้อมูล</td></tr></tbody></table>
+<p>##### ตารางที่ 3.4: ตารางข้อมูลลูกค้า (customers)</p>
+<table><thead><tr><th>ชื่อคอลัมน์ (Field)</th><th>ชนิดข้อมูล (Data Type)</th><th>คีย์ (Key)</th><th>ค่าว่าง (Null)</th><th>คำอธิบาย (Description)</th></tr></thead><tbody><tr><td>`id`</td><td>INT AUTO_INCREMENT</td><td>PK</td><td>NO</td><td>รหัสประจำตัวลูกค้า</td></tr><tr><td>`fullname`</td><td>VARCHAR(100)</td><td>-</td><td>NO</td><td>ชื่อและนามสกุลของลูกค้า</td></tr><tr><td>`phone`</td><td>VARCHAR(20)</td><td>-</td><td>NO</td><td>หมายเลขโทรศัพท์ติดต่อ</td></tr><tr><td>`email`</td><td>VARCHAR(100)</td><td>-</td><td>YES</td><td>ที่อยู่อีเมล</td></tr><tr><td>`address`</td><td>TEXT</td><td>-</td><td>YES</td><td>ที่อยู่สำหรับติดต่อและออกเอกสาร</td></tr><tr><td>`line_id`</td><td>VARCHAR(50)</td><td>-</td><td>YES</td><td>LINE User ID สำหรับรับการแจ้งเตือน</td></tr><tr><td>`created_at`</td><td>DATETIME</td><td>-</td><td>NO</td><td>วันที่และเวลาที่ลงทะเบียน</td></tr></tbody></table>
+<p>##### ตารางที่ 3.5: ตารางข้อมูลยานพาหนะ (vehicles)</p>
+<table><thead><tr><th>ชื่อคอลัมน์ (Field)</th><th>ชนิดข้อมูล (Data Type)</th><th>คีย์ (Key)</th><th>ค่าว่าง (Null)</th><th>คำอธิบาย (Description)</th></tr></thead><tbody><tr><td>`id`</td><td>INT AUTO_INCREMENT</td><td>PK</td><td>NO</td><td>รหัสประจำยานพาหนะ</td></tr><tr><td>`customer_id`</td><td>INT</td><td>FK</td><td>NO</td><td>รหัสอ้างอิงเจ้าของรถ (`customers.id`)</td></tr><tr><td>`license_plate`</td><td>VARCHAR(20)</td><td>-</td><td>NO</td><td>หมายเลขทะเบียนและจังหวัด</td></tr><tr><td>`brand`</td><td>VARCHAR(50)</td><td>-</td><td>NO</td><td>ตรายี่ห้อยานพาหนะ (เช่น Toyota, Honda)</td></tr><tr><td>`model`</td><td>VARCHAR(50)</td><td>-</td><td>NO</td><td>รุ่นรถยนต์ (เช่น Vios, Civic)</td></tr><tr><td>`year`</td><td>INT</td><td>-</td><td>YES</td><td>ปีที่ผลิตยานยนต์ (ค.ศ.)</td></tr><tr><td>`color`</td><td>VARCHAR(30)</td><td>-</td><td>YES</td><td>สีตัวถังยานยนต์</td></tr><tr><td>`vin`</td><td>VARCHAR(50)</td><td>-</td><td>YES</td><td>หมายเลขตัวถังยานยนต์ (Vehicle Identification Number)</td></tr><tr><td>`created_at`</td><td>DATETIME</td><td>-</td><td>NO</td><td>วันที่และเวลาที่บันทึกข้อมูล</td></tr></tbody></table>
+<p>##### ตารางที่ 3.6: ตารางข้อมูลงานซ่อมบำรุง (repairs)</p>
+<table><thead><tr><th>ชื่อคอลัมน์ (Field)</th><th>ชนิดข้อมูล (Data Type)</th><th>คีย์ (Key)</th><th>ค่าว่าง (Null)</th><th>คำอธิบาย (Description)</th></tr></thead><tbody><tr><td>`id`</td><td>INT AUTO_INCREMENT</td><td>PK</td><td>NO</td><td>รหัสประจำใบสั่งซ่อม</td></tr><tr><td>`vehicle_id`</td><td>INT</td><td>FK</td><td>NO</td><td>รหัสอ้างอิงยานพาหนะ (`vehicles.id`)</td></tr><tr><td>`customer_id`</td><td>INT</td><td>FK</td><td>NO</td><td>รหัสอ้างอิงลูกค้า (`customers.id`)</td></tr><tr><td>`mechanic_id`</td><td>INT</td><td>FK</td><td>YES</td><td>รหัสช่างผู้รับผิดชอบ (`users.id`)</td></tr><tr><td>`description`</td><td>TEXT</td><td>-</td><td>YES</td><td>รายละเอียดอาการเสียที่ได้รับแจ้ง</td></tr><tr><td>`status`</td><td>ENUM(...)</td><td>-</td><td>NO</td><td>สถานะงานซ่อม ('pending' ถึง 'completed', 'cancelled')</td></tr><tr><td>`estimated_cost`</td><td>DECIMAL(10,2)</td><td>-</td><td>YES</td><td>ราคาประเมินเบื้องต้น (บาท)</td></tr><tr><td>`actual_cost`</td><td>DECIMAL(10,2)</td><td>-</td><td>YES</td><td>ค่าใช้จ่ายสุทธิรวมจริง (บาท)</td></tr><tr><td>`car_photo_before`</td><td>VARCHAR(255)</td><td>-</td><td>YES</td><td>ที่อยู่แฟ้มภาพถ่ายสภาพรถก่อนเริ่มซ่อม</td></tr><tr><td>`car_photo_after`</td><td>VARCHAR(255)</td><td>-</td><td>YES</td><td>ที่อยู่แฟ้มภาพถ่ายสภาพรถหลังซ่อมเสร็จ</td></tr><tr><td>`warranty_expire_date`</td><td>DATE</td><td>-</td><td>YES</td><td>วันที่สิ้นสุดการรับประกันงานซ่อม</td></tr><tr><td>`created_at`</td><td>DATETIME</td><td>-</td><td>NO</td><td>วันเวลาที่เปิดใบรับซ่อม</td></tr><tr><td>`updated_at`</td><td>DATETIME</td><td>-</td><td>NO</td><td>วันเวลาที่มีการอัปเดตสถานะล่าสุด</td></tr></tbody></table>
+<p>##### ตารางที่ 3.7: ตารางข้อมูลคลังอะไหล่ (inventory)</p>
+<table><thead><tr><th>ชื่อคอลัมน์ (Field)</th><th>ชนิดข้อมูล (Data Type)</th><th>คีย์ (Key)</th><th>ค่าว่าง (Null)</th><th>คำอธิบาย (Description)</th></tr></thead><tbody><tr><td>`id`</td><td>INT AUTO_INCREMENT</td><td>PK</td><td>NO</td><td>รหัสประจำรายการอะไหล่</td></tr><tr><td>`part_name`</td><td>VARCHAR(100)</td><td>-</td><td>NO</td><td>ชื่อรายการอะไหล่</td></tr><tr><td>`part_number`</td><td>VARCHAR(50)</td><td>UK</td><td>YES</td><td>รหัสชิ้นส่วนอะไหล่ (Part Number)</td></tr><tr><td>`category`</td><td>VARCHAR(50)</td><td>-</td><td>YES</td><td>หมวดหมู่ของอะไหล่ (เช่น น้ำมันหล่อลื่น, ช่วงล่าง)</td></tr><tr><td>`stock_qty`</td><td>INT</td><td>-</td><td>NO</td><td>จำนวนคงเหลือจริงในคลัง</td></tr><tr><td>`min_qty`</td><td>INT</td><td>-</td><td>NO</td><td>จำนวนขั้นต่ำสำหรับสั่งซื้อเพิ่ม (Reorder Point)</td></tr><tr><td>`cost_price`</td><td>DECIMAL(10,2)</td><td>-</td><td>NO</td><td>ราคาทุนต่อหน่วย (บาท)</td></tr><tr><td>`sell_price`</td><td>DECIMAL(10,2)</td><td>-</td><td>NO</td><td>ราคาขายต่อหน่วย (บาท)</td></tr><tr><td>`supplier`</td><td>VARCHAR(100)</td><td>-</td><td>YES</td><td>ข้อมูลผู้จัดจำหน่ายหรือร้านค้าคู่ค้า</td></tr><tr><td>`updated_at`</td><td>DATETIME</td><td>-</td><td>NO</td><td>วันเวลาที่ปรับปรุงยอดล่าสุด</td></tr></tbody></table>
+<p>##### ตารางที่ 3.8: ตารางข้อมูลการเบิกอะไหล่ในงานซ่อม (repair_parts)</p>
+<table><thead><tr><th>ชื่อคอลัมน์ (Field)</th><th>ชนิดข้อมูล (Data Type)</th><th>คีย์ (Key)</th><th>ค่าว่าง (Null)</th><th>คำอธิบาย (Description)</th></tr></thead><tbody><tr><td>`id`</td><td>INT AUTO_INCREMENT</td><td>PK</td><td>NO</td><td>รหัสรายการเบิกอะไหล่</td></tr><tr><td>`repair_id`</td><td>INT</td><td>FK</td><td>NO</td><td>รหัสอ้างอิงใบสั่งซ่อม (`repairs.id`)</td></tr><tr><td>`part_id`</td><td>INT</td><td>FK</td><td>NO</td><td>รหัสอ้างอิงอะไหล่ (`inventory.id`)</td></tr><tr><td>`quantity`</td><td>INT</td><td>-</td><td>NO</td><td>จำนวนชิ้นที่ใช้ในงานซ่อมนี้</td></tr><tr><td>`sell_price`</td><td>DECIMAL(10,2)</td><td>-</td><td>NO</td><td>ราคาขายต่อหน่วย ณ วันที่บันทึกเบิก</td></tr></tbody></table>
+<p>##### ตารางที่ 3.9: ตารางบันทึกประวัติการเปลี่ยนสถานะงานซ่อม (repair_logs)</p>
+<table><thead><tr><th>ชื่อคอลัมน์ (Field)</th><th>ชนิดข้อมูล (Data Type)</th><th>คีย์ (Key)</th><th>ค่าว่าง (Null)</th><th>คำอธิบาย (Description)</th></tr></thead><tbody><tr><td>`id`</td><td>INT AUTO_INCREMENT</td><td>PK</td><td>NO</td><td>รหัสบันทึกความเคลื่อนไหว</td></tr><tr><td>`repair_id`</td><td>INT</td><td>FK</td><td>NO</td><td>รหัสอ้างอิงใบสั่งซ่อม (`repairs.id`)</td></tr><tr><td>`status`</td><td>VARCHAR(50)</td><td>-</td><td>NO</td><td>สถานะที่เปลี่ยนผ่าน</td></tr><tr><td>`notes`</td><td>TEXT</td><td>-</td><td>YES</td><td>บันทึกเพิ่มเติมของช่าง</td></tr><tr><td>`updated_by`</td><td>INT</td><td>FK</td><td>YES</td><td>รหัสผู้บันทึกความเปลี่ยนแปลง (`users.id`)</td></tr><tr><td>`created_at`</td><td>DATETIME</td><td>-</td><td>NO</td><td>วันและเวลาที่บันทึก</td></tr></tbody></table>
+<p>##### ตารางที่ 3.10: ตารางข้อมูลการเงินและธุรกรรม (finances)</p>
+<table><thead><tr><th>ชื่อคอลัมน์ (Field)</th><th>ชนิดข้อมูล (Data Type)</th><th>คีย์ (Key)</th><th>ค่าว่าง (Null)</th><th>คำอธิบาย (Description)</th></tr></thead><tbody><tr><td>`id`</td><td>INT AUTO_INCREMENT</td><td>PK</td><td>NO</td><td>รหัสธุรกรรมทางการเงิน</td></tr><tr><td>`repair_id`</td><td>INT</td><td>FK</td><td>YES</td><td>รหัสอ้างอิงงานซ่อม (กรณีเป็นรายได้จากงานซ่อม)</td></tr><tr><td>`type`</td><td>ENUM('income','expense')</td><td>-</td><td>NO</td><td>ประเภทรายการ (รายรับ หรือ รายจ่าย)</td></tr><tr><td>`amount`</td><td>DECIMAL(10,2)</td><td>-</td><td>NO</td><td>จำนวนเงินสุทธิ (บาท)</td></tr><tr><td>`payment_method`</td><td>ENUM('cash','transfer','qr')</td><td>-</td><td>NO</td><td>วิธีการชำระเงิน</td></tr><tr><td>`status`</td><td>ENUM(...)</td><td>-</td><td>NO</td><td>สถานะการชำระ ('pending','paid','cancelled','installment')</td></tr><tr><td>`installment_terms`</td><td>TEXT</td><td>-</td><td>YES</td><td>รายละเอียดและเงื่อนไขการผ่อนชำระค่างวด</td></tr><tr><td>`description`</td><td>TEXT</td><td>-</td><td>YES</td><td>รายละเอียดคำอธิบายรายการ</td></tr><tr><td>`transaction_date`</td><td>DATETIME</td><td>-</td><td>NO</td><td>วันที่และเวลาที่ทำธุรกรรม</td></tr></tbody></table>
+<p>##### ตารางที่ 3.11: ตารางบันทึกเวลาปฏิบัติงานของช่าง (attendances)</p>
+<table><thead><tr><th>ชื่อคอลัมน์ (Field)</th><th>ชนิดข้อมูล (Data Type)</th><th>คีย์ (Key)</th><th>ค่าว่าง (Null)</th><th>คำอธิบาย (Description)</th></tr></thead><tbody><tr><td>`id`</td><td>INT AUTO_INCREMENT</td><td>PK</td><td>NO</td><td>รหัสบันทึกการลงเวลา</td></tr><tr><td>`user_id`</td><td>INT</td><td>FK</td><td>NO</td><td>รหัสอ้างอิงช่างผู้ปฏิบัติงาน (`users.id`)</td></tr><tr><td>`work_date`</td><td>DATE</td><td>-</td><td>NO</td><td>วันที่ปฏิบัติงาน (YYYY-MM-DD)</td></tr><tr><td>`clock_in`</td><td>TIME</td><td>-</td><td>YES</td><td>เวลาสแกนเข้างาน</td></tr><tr><td>`clock_out`</td><td>TIME</td><td>-</td><td>YES</td><td>เวลาสแกนออกงาน</td></tr><tr><td>`status`</td><td>ENUM(...)</td><td>-</td><td>NO</td><td>สถานะ ('present','late','leave_sick','leave_business','leave_vacation','absent')</td></tr><tr><td>`notes`</td><td>TEXT</td><td>-</td><td>YES</td><td>หมายเหตุเพิ่มเติม</td></tr><tr><td>`created_at`</td><td>DATETIME</td><td>-</td><td>NO</td><td>วันเวลาที่บันทึกประวัติเข้าระบบ</td></tr></tbody></table>
+<p>*หมายเหตุ: ตารางกำหนด UNIQUE KEY บนคู่ฟิลด์ `(user_id, work_date)` เพื่อป้องกันการบันทึกแถวซ้ำซ้อนในวันเดียวกัน*</p>
+<p>##### ตารางที่ 3.12: ตารางบันทึกการตรวจสอบระบบ (audit_logs)</p>
+<table><thead><tr><th>ชื่อคอลัมน์ (Field)</th><th>ชนิดข้อมูล (Data Type)</th><th>คีย์ (Key)</th><th>ค่าว่าง (Null)</th><th>คำอธิบาย (Description)</th></tr></thead><tbody><tr><td>`id`</td><td>INT AUTO_INCREMENT</td><td>PK</td><td>NO</td><td>รหัสบันทึกการตรวจสอบ</td></tr><tr><td>`user_id`</td><td>INT</td><td>FK</td><td>YES</td><td>รหัสผู้กระทำรายการ (`users.id`)</td></tr><tr><td>`action`</td><td>VARCHAR(100)</td><td>-</td><td>NO</td><td>กิจกรรมที่กระทำ (เช่น CREATE_REPAIR, BACKUP_DB)</td></tr><tr><td>`details`</td><td>TEXT</td><td>-</td><td>YES</td><td>รายละเอียดค่าพารามิเตอร์หรือการเปลี่ยนแปลง</td></tr><tr><td>`created_at`</td><td>DATETIME</td><td>-</td><td>NO</td><td>วันและเวลาที่เกิดกิจกรรม</td></tr></tbody></table>
+<p>##### ตารางที่ 3.13: ตารางค่ากำหนดระบบ (settings)</p>
+<table><thead><tr><th>ชื่อคอลัมน์ (Field)</th><th>ชนิดข้อมูล (Data Type)</th><th>คีย์ (Key)</th><th>ค่าว่าง (Null)</th><th>คำอธิบาย (Description)</th></tr></thead><tbody><tr><td>`id`</td><td>INT AUTO_INCREMENT</td><td>PK</td><td>NO</td><td>รหัสรายการตั้งค่า</td></tr><tr><td>`setting_key`</td><td>VARCHAR(50)</td><td>UK</td><td>NO</td><td>ชื่อตัวแปรการตั้งค่า (เช่น promptpay_id, vat_rate)</td></tr><tr><td>`setting_value`</td><td>TEXT</td><td>-</td><td>YES</td><td>ค่าของตัวแปรการตั้งค่า</td></tr><tr><td>`updated_at`</td><td>DATETIME</td><td>-</td><td>NO</td><td>วันเวลาที่แก้ไขค่าล่าสุด</td></tr></tbody></table>
+<hr/>
+<h4>3) สถาปัตยกรรมโครงสร้างแฟ้มข้อมูลของระบบ (Directory Structure &amp; MVC Routes)</h4>
+<p>โค้ดต้นฉบับของระบบได้รับการจัดระเบียบตามโครงสร้างสถาปัตยกรรม MVC ของ Node.js/Express อย่างเคร่งครัด ดังโครงสร้างต่อไปนี้:</p>
+<div class="code-box">jectcar/
+├── config/
+│   └── db.js                      # ตัวจัดการเชื่อมต่อฐานข้อมูล MariaDB/MySQL (Connection Pool)
+├── controllers/                   # ส่วนประมวลผลตรรกะระบบ (Business Logic Controllers)
+│   ├── attendanceController.js    # ตรรกะคีออสก์ Dynamic QR และคำนวณวันเข้างานช่าง
+│   ├── authController.js          # ตรรกะยืนยันตัวตนและการจัดการเซสชัน
+│   ├── customerController.js      # ตรรกะจัดการข้อมูลลูกค้าและยานพาหนะ
+│   ├── dashboardController.js     # ตรรกะรวบรวมข้อมูลสถิติและกระดานบริหาร
+│   ├── financeController.js       # ตรรกะคำนวณการเงิน ออกใบแจ้งหนี้ และ PromptPay QR
+│   ├── inventoryController.js    # ตรรกะจัดการคลัง ตรวจสอบจุดสั่งซื้อซ้ำ
+│   ├── repairController.js       # ตรรกะควบคุมวงจรชีวิตงานซ่อม 7 ขั้นตอน และจัดการสต็อก
+│   └── userController.js          # ตรรกะบริหารจัดการข้อมูลและสิทธิ์ผู้ใช้งาน
+├── middleware/                    # ส่วนดักกรองการร้องขอและตรวจสอบความปลอดภัย
+│   ├── authMiddleware.js          # ตรวจสอบสิทธิ์การเข้าสู่ระบบและบทบาท (RBAC)
+│   └── uploadMiddleware.js        # กำหนดค่าการอัปโหลดไฟล์ภาพและตรวจประเภทนามสกุล
+├── routes/                        # ส่วนกำหนดเส้นทางของระบบ (Routing Definitions)
+│   ├── attendanceRoutes.js        # เส้นทางระบบคีออสก์และการลงเวลาเข้างาน
+│   ├── authRoutes.js              # เส้นทางระบบการเข้าสู่ระบบ/ออกจากระบบ
+│   ├── customerRoutes.js          # เส้นทางข้อมูลลูกค้าและประวัติรถ
+│   ├── dashboardRoutes.js         # เส้นทางหน้ากระดานบริหารสถิติ
+│   ├── financeRoutes.js           # เส้นทางระบบการเงินและใบเสร็จ
+│   ├── inventoryRoutes.js         # เส้นทางระบบคลังสินค้า
+│   ├── repairRoutes.js            # เส้นทางระบบงานซ่อมและอัปเดตสถานะ
+│   └── userRoutes.js              # เส้นทางจัดการข้อมูลผู้ใช้
+├── views/                         # ส่วนแสดงผลส่วนติดต่อผู้ใช้ (EJS View Templates)
+│   ├── attendance/                # หน้าจอคีออสก์, หน้ารหัสสแกน และบัตรแสดงผล
+│   ├── customers/                 # แบบฟอร์มและตารางแสดงข้อมูลลูกค้า
+│   ├── dashboard/                 # เทมเพลตกระดานสรุปผลและกราฟิกสถิติ
+│   ├── finance/                   # เทมเพลตใบเสร็จ ใบประเมินราคา และ PromptPay QR
+│   ├── inventory/                 # ตารางแสดงสต็อกและแบบฟอร์มเพิ่มอะไหล่
+│   ├── repairs/                   # หน้าจอติดตามงานซ่อม 7 ขั้นตอน และแบบฟอร์มเปิดงาน
+│   ├── layouts/                   # เทมเพลตโครงสร้างหลัก (Header, Sidebar, Footer)
+│   └── public/                    # หน้าจอติดตามงานซ่อมสำหรับลูกค้าภายนอก
+├── public/                        # แฟ้มข้อมูลสาธารณะ (Static Assets)
+│   ├── css/                       # ไฟล์สไตล์ชีท Tailwind CSS และการตกแต่ง
+│   ├── js/                        # สคริปต์ควบคุมการทำงานฝั่งเบราว์เซอร์
+│   └── uploads/                   # แฟ้มจัดเก็บไฟล์ภาพถ่ายสภาพรถก่อน-หลังซ่อม
+├── database/
+│   └── schema.sql                 # สคริปต์ DDL สำหรับสร้างตารางฐานข้อมูลและดัชนี
+├── package.json                   # รายการไลบรารีและคำสั่งสคริปต์ของโครงการ
+└── server.js                      # จุดเริ่มต้นของโปรแกรม (Main Application Entry Point)</div>
+<hr/>
+<h4>4) การออกแบบเส้นทางและจุดเชื่อมต่อระบบ (Routing &amp; API Endpoints Design)</h4>
+<p>##### ตารางที่ 3.14: การออกแบบเส้นทางและจุดบริการหลักของระบบ</p>
+<table><thead><tr><th>วิธี (HTTP Method)</th><th>เส้นทาง (Route / URL Endpoint)</th><th>สิทธิ์การเข้าถึง (Access Level)</th><th>รายละเอียดหน้าที่การทำงาน (Functionality)</th></tr></thead><tbody><tr><td>`POST`</td><td>`/auth/login`</td><td>สาธารณะ</td><td>ตรวจสอบชื่อผู้ใช้/รหัสผ่าน และสร้างเซสชัน</td></tr><tr><td>`GET`</td><td>`/auth/logout`</td><td>ผู้ใช้ในระบบ</td><td>ล้างเซสชันและออกจากระบบ</td></tr><tr><td>`GET`</td><td>`/dashboard`</td><td>เจ้าของอู่ / ช่าง</td><td>แสดงหน้ากระดานบริหารและตัวชี้วัดสถิติ</td></tr><tr><td>`GET`</td><td>`/repairs`</td><td>เจ้าของอู่ / ช่าง</td><td>แสดงรายการงานซ่อมทั้งหมดพร้อมตัวกรองสถานะ</td></tr><tr><td>`POST`</td><td>`/repairs/create`</td><td>เจ้าของอู่ / ช่าง</td><td>เปิดใบสั่งซ่อมใหม่พร้อมบันทึกภาพถ่าย Before</td></tr><tr><td>`POST`</td><td>`/repairs/:id/status`</td><td>เจ้าของอู่ / ช่าง</td><td>เปลี่ยนสถานะงานซ่อม และตัดสต็อก/คืนสต็อกอัตโนมัติ</td></tr><tr><td>`GET`</td><td>`/repairs/:id/invoice`</td><td>เจ้าของอู่</td><td>แสดงและพิมพ์ใบแจ้งหนี้/ใบเสร็จรับเงิน</td></tr><tr><td>`GET`</td><td>`/inventory`</td><td>เจ้าของอู่ / ช่าง</td><td>แสดงรายการอะไหล่และรายการแจ้งเตือนใกล้หมด</td></tr><tr><td>`POST`</td><td>`/inventory/add`</td><td>เจ้าของอู่</td><td>เพิ่มรายการอะไหล่ใหม่และกำหนด Reorder Point</td></tr><tr><td>`GET`</td><td>`/finances`</td><td>เจ้าของอู่</td><td>แสดงรายงานบัญชีรายรับ-รายจ่าย และยอดค้างชำระ</td></tr><tr><td>`GET`</td><td>`/attendance`</td><td>เจ้าของอู่ / ช่าง</td><td>แสดงประวัติการลงเวลาและสรุปยอดวันทำงาน</td></tr><tr><td>`GET`</td><td>`/attendance/qr-kiosk`</td><td>เจ้าของอู่</td><td>หน้าจอคีออสก์แสดง Dynamic QR ที่รีเฟรชทุก 1 นาที</td></tr><tr><td>`GET`</td><td>`/attendance/qr-api`</td><td>เจ้าของอู่</td><td>API ส่งข้อมูลโทเคน QR ปัจจุบันและรายชื่อช่างที่มา</td></tr><tr><td>`GET`</td><td>`/attendance/scan`</td><td>ช่างซ่อมบำรุง</td><td>หน้าจอมือถือสำหรับรับค่าสแกน QR บันทึกเข้า-ออกงาน</td></tr><tr><td>`POST`</td><td>`/attendance/scan-checkin`</td><td>ช่างซ่อมบำรุง</td><td>ประมวลผลโทเคนและบันทึกเวลาเข้า-ออกงานลงฐานข้อมูล</td></tr><tr><td>`GET`</td><td>`/public/track`</td><td>สาธารณะ (ลูกค้า)</td><td>หน้าเว็บสืบค้นสถานะงานซ่อมผ่านหมายเลขทะเบียนรถ</td></tr><tr><td>`GET`</td><td>`/backup/download`</td><td>เจ้าของอู่</td><td>สั่งสำรองฐานข้อมูลและดาวน์โหลดไฟล์ SQL Dump</td></tr></tbody></table>
+<hr/>
+<h2>3.4 การออกแบบส่วนติดต่อและประสานงานกับผู้ใช้งาน (User Interface Design)</h2>
+<h3>3.4.1 ผังโครงสร้างหน้าจอระบบงาน (Site Map &amp; Navigation Flow)</h3>
+<p>ผังโครงสร้างการนำทางจำแนกการเข้าถึงตามระดับสิทธิ์ของผู้ใช้งาน เพื่อให้เกิดความคล่องตัวในการปฏิบัติงานจริง:</p>
+<div class="code-box">[ระบบบริหารจัดการอู่ซ่อมบำรุงยานยนต์]
+│
+├── 1. ส่วนสาธารณะ (Public Area - สำหรับลูกค้าทั่วไป)
+│   ├── หน้าสืบค้นสถานะงานซ่อมด้วยเลขทะเบียนรถ (/public/track)
+│   └── หน้าผลลัพธ์แสดงสถานะงานซ่อม 7 ขั้นตอน พร้อมภาพ Before/After และ QR PromptPay
+│
+├── 2. ส่วนการพิสูจน์สิทธิ์ (Authentication Area)
+│   └── หน้าต่างเข้าสู่ระบบ (/auth/login)
+│
+├── 3. ส่วนงานช่างซ่อมบำรุง (Mechanic Portal)
+│   ├── กระดานงานซ่อมที่ได้รับมอบหมาย
+│   ├── หน้าบันทึกตรวจเช็กและอัปเดตสถานะงานซ่อม
+│   ├── หน้ารายการเบิกอะไหล่
+│   ├── หน้าสแกน QR Code ลงเวลาเข้า-ออกงานผ่านสมาร์ตโฟน (/attendance/scan)
+│   └── หน้าบัตรยืนยันการลงเวลาสำเร็จพร้อมสรุปวันทำงานในเดือน
+│
+└── 4. ส่วนการบริหารของเจ้าของอู่ (Workshop Owner / Admin Management)
+    ├── กระดานวิเคราะห์ข้อมูลเชิงลึก (Executive Dashboard)
+    ├── ระบบจัดการงานซ่อมแบบสมบูรณ์ (ครบ 7 ขั้นตอน)
+    ├── ระบบบริหารคลังอะไหล่และแจ้งเตือน Reorder Point
+    ├── ระบบการเงิน ออกบิล รายรับ-รายจ่าย และผ่อนชำระ
+    ├── ระบบจัดการข้อมูลลูกค้าและยานพาหนะ
+    ├── ระบบจัดการบัญชีผู้ใช้และช่างซ่อมบำรุง
+    ├── หน้าจอคีออสก์ Dynamic QR สำหรับตั้งหน้าจอให้อู่ (/attendance/qr-kiosk)
+    └── ระบบสำรองฐานข้อมูล (Backup &amp; Recovery)</div>
+<hr/>
+<h3>3.4.2 การออกแบบหน้าจอสำหรับเครื่องคอมพิวเตอร์ตั้งโต๊ะ (Desktop Web Interface)</h3>
+<p class="numbered"><b>1.</b> <b>หน้าจอกระดานบริหารข้อมูลหลัก (Executive Dashboard Interface):</b></p>
+<p class="bullet">• &nbsp; <b>ส่วนบน (Top Navigation):</b> แสดงตราสัญลักษณ์ของอู่, ชื่อผู้เข้าใช้งาน, สถานะสิทธิ์การใช้งาน และปุ่มออกจากระบบ</p>
+<p class="bullet">• &nbsp; <b>ส่วนสถิติภาพรวม (Summary KPI Cards):</b> จัดวางการ์ดสถิติ 4 ช่องหลัก ได้แก่: ยอดรายรับรวมประจำเดือน, จำนวนงานซ่อมที่กำลังดำเนินการ, จำนวนรถรอตรวจสภาพ และรายการอะไหล่ที่ต้องสั่งซื้อด่วน</p>
+<p class="bullet">• &nbsp; <b>ส่วนแผนภูมิวิเคราะห์ (Analytical Charts):</b> แสดงกราฟแท่งแนวโน้มรายรับ-รายจ่ายประจำสัปดาห์ และกราฟวงกลมแสดงสัดส่วนประเภทงานซ่อมที่เข้ามารับบริการมากที่สุด</p>
+<p class="bullet">• &nbsp; <b>ส่วนตารางงานซ่อมด่วน (Recent Active Repairs):</b> แสดงรายการงานซ่อมล่าสุด พร้อมรหัสงาน ทะเบียนรถ ช่างผู้รับผิดชอบ และแถบสีแสดงสถานะการซ่อม (Badge Status)</p>
+<p class="numbered"><b>2.</b> <b>หน้าจอจัดการวงจรชีวิตงานซ่อม (Repair Order Management Interface):</b></p>
+<p class="bullet">• &nbsp; ออกแบบในลักษณะกระดานคัมบัง (Kanban Board) ผสมผสานมุมมองตาราง (Data Table)</p>
+<p class="bullet">• &nbsp; แถบแสดงความคืบหน้า 7 ขั้นตอน (Progress Stepper) ช่วยให้ผู้ดูแลระบบมองเห็นจุดติดขัดของงานได้ในทันที</p>
+<p class="bullet">• &nbsp; แผงควบคุมด้านข้างรองรับการอัปโหลดรูปถ่ายเปรียบเทียบก่อน-หลังซ่อม และการคลิกเพื่อเบิกจ่ายอะไหล่</p>
+<p class="numbered"><b>3.</b> <b>หน้าจอคีออสก์ลงเวลาเข้างานประจำอู่ (Dynamic QR Attendance Kiosk Interface):</b></p>
+<p class="bullet">• &nbsp; ได้รับการออกแบบสำหรับเปิดเต็มหน้าจอ (Full Screen Kiosk) บนคอมพิวเตอร์หรือแท็บเล็ตประจำโต๊ะประชาสัมพันธ์ของอู่</p>
+<p class="bullet">• &nbsp; นาฬิกาดิจิทัลขนาดใหญ่บอกเวลาปัจจุบันแบบวินาที พร้อมวันที่ภาษาไทย</p>
+<p class="bullet">• &nbsp; กรอบแสดงภาพ QR Code ความละเอียดสูง ซึ่งจะทำการเปลี่ยนรหัสโทเคนใหม่ทุก ๆ 60 วินาที</p>
+<p class="bullet">• &nbsp; แถบแสดงความคืบหน้านับถอยหลัง (Circular / Bar Progress Countdown 60s) และปุ่มกดสร้างรหัสใหม่แบบเร่งด่วน (Manual Refresh)</p>
+<p class="bullet">• &nbsp; แผงรายชื่อช่าง (Live Check-In Badges) แสดงภาพและชื่อของช่างที่ทำการสแกนเช็กอินสำเร็จในวันนั้นแบบทันที</p>
+<hr/>
+<h3>3.4.3 การออกแบบหน้าจอสำหรับอุปกรณ์เคลื่อนที่และแท็บเล็ต (Mobile Responsive Interface)</h3>
+<p class="numbered"><b>1.</b> <b>หน้าจอสำหรับช่างซ่อมบำรุง (Mechanic Mobile View):</b></p>
+<p class="bullet">• &nbsp; ออกแบบด้วยปุ่มกดขนาดใหญ่ที่สะดวกต่อการสัมผัสขณะสวมถุงมือปฏิบัติงาน</p>
+<p class="bullet">• &nbsp; ช่างสามารถถ่ายภาพสภาพรถยนต์ผ่านกล้องสมาร์ตโฟนแล้วอัปโหลดขึ้นสู่ระบบได้ทันที</p>
+<p class="bullet">• &nbsp; ปุ่มลัด "สแกนเช็กอิน" เพื่อเปิดกล้องสแกน QR Code จากหน้าจอคอมพิวเตอร์ของอู่</p>
+<p class="numbered"><b>2.</b> <b>หน้าจอแสดงผลบัตรยืนยันการเช็กอิน (Attendance Confirmation Card):</b></p>
+<p class="bullet">• &nbsp; เมื่อสแกนรหัสผ่าน ระบบจะแสดงหน้าบัตรสีเขียวพร้อมแอนิเมชันยืนยันความสำเร็จ</p>
+<p class="bullet">• &nbsp; ระบุชื่อช่าง, เวลาที่บันทึกสำเร็จ (เช่น 08:25:14 น.), สถานะ (ตรงเวลา / เข้างานสาย)</p>
+<p class="bullet">• &nbsp; แสดงตัวเลขสรุป "จำนวนวันที่เข้าทำงานแล้วในเดือนนี้" เพื่อสร้างความโปร่งใสและสร้างแรงจูงใจแก่ช่าง</p>
+<p class="numbered"><b>3.</b> <b>หน้าจอสืบค้นสถานะงานซ่อมสำหรับลูกค้า (Customer Mobile Portal):</b></p>
+<p class="bullet">• &nbsp; ช่องค้นหาหมายเลขทะเบียนรถยนต์ที่เรียบง่าย</p>
+<p class="bullet">• &nbsp; แถบขั้นตอนแสดงสถานะรถยนต์ปัจจุบัน พร้อมรูปภาพรถยนต์ระหว่างดำเนินการซ่อม</p>
+<p class="bullet">• &nbsp; แสดงยอดเงินที่ต้องชำระ พร้อมปุ่มกดแสดง QR Code สำหรับบันทึกภาพไปเปิดในแอปพลิเคชันธนาคาร</p>
+<hr/>
+<h3>3.4.4 การออกแบบส่วนต่อประสานผ่านแอปพลิเคชันภายนอก (External Platform Interface)</h3>
+<p class="numbered"><b>1.</b> <b>การแจ้งเตือนผ่าน LINE Official Account (LINE Messaging Flex Message):</b></p>
+<p class="bullet">• &nbsp; เชื่อมต่อผ่าน LINE Messaging API Webhook</p>
+<p class="bullet">• &nbsp; ออกแบบข้อความตอบกลับในรูปแบบ <b>LINE Flex Message (Bubble Component)</b> ที่มีสีสันสวยงามและดูเป็นมืออาชีพ ประกอบด้วย:</p>
+<p class="bullet">• &nbsp; ส่วนหัว (Header): ชื่ออู่ซ่อมรถและตราสัญลักษณ์</p>
+<p class="bullet">• &nbsp; ส่วนรูปภาพ (Hero Image): ภาพถ่ายสภาพรถยนต์ล่าสุด (Before หรือ After Photo)</p>
+<p class="bullet">• &nbsp; ส่วนเนื้อหา (Body): หมายเลขทะเบียนรถ, อาการเสีย, สถานะปัจจุบัน (เช่น รถของท่านกำลังอยู่ในขั้นตอนทดสอบสมรรถนะ), และชื่อช่างผู้ดูแล</p>
+<p class="bullet">• &nbsp; ส่วนปุ่มดำเนินการ (Action Footer): ปุ่ม "ดูรายละเอียดงานซ่อมฉบับเต็ม" ลิงก์ตรงไปยังหน้า Public Tracking และปุ่ม "สแกนจ่ายเงินผ่าน PromptPay"</p>
+<p class="numbered"><b>2.</b> <b>ระบบสร้างคิวอาร์โค้ดรับเงินพร้อมเพย์แบบพลวัต (PromptPay Dynamic QR Code):</b></p>
+<p class="bullet">• &nbsp; นำมาตรฐาน EMVCo QR Code สำหรับบริการ PromptPay มาประยุกต์ใช้ผ่านโมดูล `promptpay-qr`</p>
+<p class="bullet">• &nbsp; ระบบจะนำหมายเลขพร้อมเพย์ของอู่ (PromptPay ID จากตาราง `settings`) ผนวกกับยอดหนี้สุทธิของใบสั่งซ่อมนั้น ๆ เพื่อสร้างภาพ QR Code ออกมาโดยอัตโนมัติ</p>
+<p class="bullet">• &nbsp; ลูกค้าสามารถสแกนจ่ายได้ทันทีโดยไม่ต้องกรอกยอดเงินเอง ป้องกันความผิดพลาดจากการโอนเงินไม่ครบถ้วน</p>
+<hr/>
+<h2>3.5 บทสรุป (Chapter Summary)</h2>
+<p>บทที่ 3 ได้นำเสนอการวิเคราะห์และออกแบบระบบบริหารจัดการอู่ซ่อมบำรุงยานยนต์อย่างเป็นระบบตามหลักวิศวกรรมซอฟต์แวร์ โดยครอบคลุมตั้งแต่การกำหนดความต้องการเชิงหน้าที่ 9 โมดูล และความต้องการที่ไม่ใช่เชิงหน้าที่ตามมาตรฐานความมั่นคงปลอดภัย สถาปัตยกรรมระบบได้รับการออกแบบตามรูปแบบ 3-Tier MVC Architecture บนฐานเทคโนโลยี Node.js, Express.js และ MariaDB/MySQL ซึ่งแยกหน้าที่การทำงานออกเป็นสัดส่วนชัดเจน</p>
+<p>วงจรชีวิตงานซ่อมถูกออกแบบให้ครอบคลุม 7 ขั้นตอนการปฏิบัติงานจริง พร้อมกลไกการตัดสต็อกอะไหล่อัตโนมัติและการคืนสต็อกกรณียกเลิกงานซ่อม แผนภาพกระแสข้อมูลและแบบจำลองฐานข้อมูลเชิงกายภาพจำนวน 11 ตารางได้รับการออกแบบให้รองรับความสัมพันธ์ของข้อมูลอย่างสมบูรณ์แบบ นอกจากนี้ ระบบยังได้บูรณาการนวัตกรรมการลงเวลาของช่างซ่อมผ่าน <b>Dynamic QR Code Kiosk</b> ที่เปลี่ยนรหัสทุก 1 นาที เพื่อป้องกันการทุจริตเวลา และการเชื่อมต่อแจ้งเตือนลูกค้าผ่าน LINE Flex Message และระบบชำระเงิน PromptPay Dynamic QR ซึ่งช่วยยกระดับความพึงพอใจของลูกค้าและเพิ่มประสิทธิภาพในการดำเนินธุรกิจของอู่ซ่อมยานยนต์อย่างเป็นรูปธรรม โดยรายละเอียดผลการพัฒนาและการทดสอบการทำงานของระบบจะนำเสนอในบทที่ 4 ต่อไป</p>
+</body>
+</html>

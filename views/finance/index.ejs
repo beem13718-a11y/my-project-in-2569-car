@@ -1,8 +1,11 @@
 <%- include('../partials/header') %>
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-  <h2 class="page-title">ระบบการเงินและบัญชี</h2>
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+  <h2 class="page-title mb-0">ระบบการเงินและบัญชี</h2>
   <div class="d-flex flex-wrap gap-2">
+    <a href="/finances/export?date_from=<%= encodeURIComponent(filters.dateFrom || '') %>&date_to=<%= encodeURIComponent(filters.dateTo || '') %>&filter_option=<%= encodeURIComponent(filters.filterOption || '') %>&search=<%= encodeURIComponent(filters.search || '') %>" class="btn btn-outline-info">
+      <i class="fa-solid fa-file-excel me-1"></i> ส่งออก Excel (.csv)
+    </a>
     <button class="btn btn-glass-success" data-bs-toggle="modal" data-bs-target="#recordIncomeModal">
       <i class="fa-solid fa-cash-register me-1"></i> รับชำระเงินค่าซ่อม
     </button>
@@ -13,7 +16,7 @@
 </div>
 
 <div id="financesContainer">
-  <!-- Hidden data store for dynamic ChartJS updates -->
+  
   <div id="chartDataStore" 
        data-labels='<%= JSON.stringify(charts.labels) %>' 
        data-income='<%= JSON.stringify(charts.income) %>' 
@@ -21,9 +24,9 @@
        data-methods='<%= JSON.stringify(charts.methods) %>'>
   </div>
 
-  <!-- Financial Summary Cards -->
+  
   <div class="row g-4 mb-4">
-  <!-- Total Income (Realized) -->
+  
   <div class="col-xl-3 col-md-6">
     <div class="glass-card stat-card">
       <div>
@@ -36,7 +39,7 @@
     </div>
   </div>
 
-  <!-- Total Pending Income (Unrealized) -->
+  
   <div class="col-xl-3 col-md-6">
     <div class="glass-card stat-card">
       <div>
@@ -49,7 +52,7 @@
     </div>
   </div>
 
-  <!-- Total Expense -->
+  
   <div class="col-xl-3 col-md-6">
     <div class="glass-card stat-card">
       <div>
@@ -62,7 +65,7 @@
     </div>
   </div>
 
-  <!-- Net Profit (Income - Expense) -->
+  
   <div class="col-xl-3 col-md-6">
     <div class="glass-card stat-card">
       <div>
@@ -78,14 +81,14 @@
   </div>
 </div>
 
-<!-- Collapsible Financial Analytics Section -->
+
 <div class="mb-4">
   <button class="btn btn-outline-warning btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#financeAnalyticsCollapse" aria-expanded="false" aria-controls="financeAnalyticsCollapse">
     <i class="fa-solid fa-chart-line me-1"></i> แสดง/ซ่อนรายงานกราฟวิเคราะห์การเงิน
   </button>
   
   <div class="collapse show mt-3" id="financeAnalyticsCollapse">
-    <!-- Integrated Quick Ranges Control Bar -->
+    
     <div class="glass-card mb-3 py-2 px-3">
       <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
         <div class="text-light fw-semibold small">
@@ -106,7 +109,7 @@
     </div>
 
     <div class="row g-4">
-      <!-- Chart 1: Revenue vs Expense Trend -->
+      
       <div class="col-lg-8">
         <div class="glass-card" style="height: 320px;">
           <h6 class="text-light mb-3"><i class="fa-solid fa-chart-area me-2 text-warning"></i>แนวโน้มรายรับ - รายจ่ายสะสม (<%= filters.period === 'today' ? 'วันนี้' : filters.period === 'this_week' ? 'สัปดาห์นี้' : filters.period === 'this_quarter' ? 'ไตรมาสนี้' : 'เดือนนี้' %>)</h6>
@@ -116,7 +119,7 @@
         </div>
       </div>
       
-      <!-- Chart 2: Income by Payment Method -->
+      
       <div class="col-lg-4">
         <div class="glass-card" style="height: 320px;">
           <h6 class="text-light mb-3"><i class="fa-solid fa-chart-pie me-2 text-info"></i>สัดส่วนช่องทางรับเงิน (การกรองปัจจุบัน)</h6>
@@ -129,42 +132,42 @@
   </div>
 </div>
 
-<!-- Advanced Search Filters -->
+
 <div class="glass-card mb-4 py-3">
   <form action="/finances" method="GET" id="financeFilterForm" class="row g-3 align-items-end">
-    <!-- Keep date period -->
+    
     <input type="hidden" name="period" value="<%= filters.period %>">
 
-    <!-- Smart Search Bar -->
+    
     <div class="col-md-5 col-sm-6">
       <label class="form-label text-muted small"><i class="fa-solid fa-brain me-1 text-info"></i> ช่องค้นหาอัจฉริยะ</label>
       <input type="text" class="form-control form-glass" name="search" value="<%= filters.search %>" placeholder="ค้นหาด้วย: เลขที่ใบเสร็จ, ชื่อลูกค้า, ทะเบียน..." style="border-radius: 8px;">
     </div>
 
-    <!-- Dropdown Selector -->
+    
     <div class="col-md-4 col-sm-6">
       <label class="form-label text-muted small"><i class="fa-solid fa-filter me-1 text-warning"></i> เลือกกรองตามประเภท/สถานะ/ช่องทางการเงิน</label>
       <select class="form-select form-glass text-light" name="filter_option" id="financeFilterSelect">
         <option value="" <%= !filters.filterOption ? 'selected' : '' %>>-- แสดงรายการทั้งหมด --</option>
         
-        <!-- ประเภทรายการ -->
+        
         <option value="type:income" <%= filters.filterOption === 'type:income' ? 'selected' : '' %>>รายรับ - เงินค่าซ่อมและค่าอะไหล่จากลูกค้า</option>
         <option value="type:expense" <%= filters.filterOption === 'type:expense' ? 'selected' : '' %>>รายจ่าย - ค่าน้ำไฟ, อะไหล่เข้าสต็อก, ค่าแรงช่าง</option>
         
-        <!-- สถานะการชำระเงิน -->
+        
         <option value="status:paid" <%= filters.filterOption === 'status:paid' ? 'selected' : '' %>>ชำระเงินแล้ว</option>
         <option value="status:pending" <%= filters.filterOption === 'status:pending' ? 'selected' : '' %>>ค้างชำระ / รอชำระ - เช็กบิลที่ค้างชำระ</option>
         <option value="status:installment" <%= filters.filterOption === 'status:installment' ? 'selected' : '' %>>ผ่อนชำระ / จ่ายบางส่วน</option>
         <option value="status:cancelled" <%= filters.filterOption === 'status:cancelled' ? 'selected' : '' %>>ยกเลิกบิล / คืนเงิน</option>
         
-        <!-- ช่องทางการชำระเงิน -->
+        
         <option value="method:cash" <%= filters.filterOption === 'method:cash' ? 'selected' : '' %>>เงินสด</option>
         <option value="method:transfer" <%= filters.filterOption === 'method:transfer' ? 'selected' : '' %>>โอนผ่านธนาคาร</option>
         <option value="method:qr" <%= filters.filterOption === 'method:qr' ? 'selected' : '' %>>สแกน QR Code</option>
       </select>
     </div>
 
-    <!-- Search Button -->
+    
     <div class="col-md-3 col-sm-12 d-grid">
       <button type="submit" class="btn btn-glass-primary">
         <i class="fa-solid fa-magnifying-glass me-1"></i> ค้นหาข้อมูล
@@ -173,10 +176,10 @@
   </form>
 </div>
 
-<!-- Transactions Table -->
+
 <div class="glass-card">
   <h5 class="text-light mb-3"><i class="fa-solid fa-list-check me-2"></i>ประวัติรายการเงินและประวัติบัญชี</h5>
-  <div class="table-responsive">
+  <div class="table-responsive d-none d-md-block">
     <table class="table-excel text-light">
       <thead>
         <tr>
@@ -255,13 +258,23 @@
                 <%= t.type === 'income' ? '+' : '-' %><%= parseFloat(t.amount).toLocaleString('th-TH', {minimumFractionDigits: 2}) %>
               </td>
               <td class="text-center">
-                <% if (t.repair_id) { %>
-                  <a href="/repairs/detail/<%= t.repair_id %>" class="btn btn-sm btn-outline-info" title="ดูใบสั่งซ่อม">
-                    <i class="fa-solid fa-file-invoice"></i> ใบซ่อม
-                  </a>
-                <% } else { %>
-                  <span class="text-muted small">-</span>
-                <% } %>
+                <div class="d-flex justify-content-center gap-1 flex-wrap">
+                  <% if (t.type === 'income' && (t.status === 'pending' || t.status === 'installment')) { %>
+                    <button type="button" class="btn btn-sm btn-outline-warning quick-qr-btn" data-id="<%= t.id %>" data-amount="<%= t.amount %>" data-desc="<%= t.description %>" title="เปิด QR พร้อมเพย์">
+                      <i class="fa-solid fa-qrcode"></i>
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-success settle-tx-btn" data-id="<%= t.id %>" data-amount="<%= t.amount %>" title="ปิดยอดรับชำระเงิน">
+                      <i class="fa-solid fa-check"></i> ปิดยอด
+                    </button>
+                  <% } %>
+                  <% if (t.repair_id) { %>
+                    <a href="/repairs/detail/<%= t.repair_id %>" class="btn btn-sm btn-outline-info" title="ดูใบสั่งซ่อม">
+                      <i class="fa-solid fa-file-invoice"></i> ใบซ่อม
+                    </a>
+                  <% } else if (t.status === 'paid' || t.type === 'expense') { %>
+                    <span class="text-muted small">-</span>
+                  <% } %>
+                </div>
               </td>
             </tr>
           <% }) %>
@@ -269,13 +282,62 @@
       </tbody>
     </table>
   </div>
+
+  
+  <div class="d-md-none d-flex flex-column gap-3">
+    <% if (transactions.length === 0) { %>
+      <div class="text-center text-muted py-4">ไม่พบรายการทางการเงินตามข้อกำหนดการค้นหา</div>
+    <% } else { %>
+      <% transactions.forEach(t => { %>
+        <div class="p-3 rounded-3 border border-secondary border-opacity-25" style="background: rgba(255,255,255,0.03);">
+          <div class="d-flex justify-content-between align-items-start mb-2">
+            <div>
+              <span class="font-monospace fw-bold text-info small">#INV-<%= t.repair_id ? t.repair_id : 'GEN-' + t.id %></span>
+              <span class="text-muted small ms-2"><%= new Date(t.transaction_date).toLocaleDateString('th-TH') %></span>
+            </div>
+            <div>
+              <% if (t.status === 'paid') { %>
+                <span class="badge text-dark fw-bold" style="background-color: #00E676 !important;">ชำระแล้ว</span>
+              <% } else if (t.status === 'pending') { %>
+                <span class="badge text-dark fw-bold" style="background-color: #FFC400 !important;">ค้างชำระ</span>
+              <% } else if (t.status === 'installment') { %>
+                <span class="badge text-light fw-bold" style="background-color: #7C4DFF !important;">ผ่อนชำระ</span>
+              <% } else { %>
+                <span class="badge text-light fw-bold" style="background-color: #FF1744 !important;">ยกเลิก</span>
+              <% } %>
+            </div>
+          </div>
+          <div class="fw-semibold text-light mb-1"><%= t.description %></div>
+          <% if (t.repair_id) { %>
+            <div class="small text-muted mb-2">ลูกค้า: <%= t.customer_name %> (<%= t.license_plate %>)</div>
+          <% } %>
+          <div class="d-flex justify-content-between align-items-center pt-2 border-top border-secondary border-opacity-25">
+            <div class="h5 mb-0 fw-bold font-monospace <%= t.type === 'income' ? (t.status === 'paid' ? 'text-success' : 'text-warning') : 'text-danger' %>">
+              <%= t.type === 'income' ? '+' : '-' %><%= parseFloat(t.amount).toLocaleString('th-TH', {minimumFractionDigits: 2}) %> ฿
+            </div>
+            <div class="d-flex gap-1">
+              <% if (t.type === 'income' && (t.status === 'pending' || t.status === 'installment')) { %>
+                <button type="button" class="btn btn-sm btn-outline-warning quick-qr-btn" data-id="<%= t.id %>" data-amount="<%= t.amount %>" data-desc="<%= t.description %>">
+                  <i class="fa-solid fa-qrcode"></i>
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-success settle-tx-btn" data-id="<%= t.id %>" data-amount="<%= t.amount %>">
+                  ปิดยอด
+                </button>
+              <% } %>
+              <% if (t.repair_id) { %>
+                <a href="/repairs/detail/<%= t.repair_id %>" class="btn btn-sm btn-outline-info">ใบซ่อม</a>
+              <% } %>
+            </div>
+          </div>
+        </div>
+      <% }) %>
+    <% } %>
+  </div>
 </div>
 
-<!-- ==========================================
-     MODALS
-     ========================================== -->
 
-<!-- Record General Expense Modal -->
+
+
 <div class="modal fade" id="recordExpenseModal" tabindex="-1" aria-labelledby="recordExpenseModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content text-light" style="background: var(--bg-color); border: 1px solid var(--card-border); border-radius: 16px; backdrop-filter: var(--glass-blur);">
@@ -285,9 +347,18 @@
       </div>
       <form id="recordExpenseForm">
         <div class="modal-body">
+          <div class="mb-2">
+            <label class="form-label small text-muted">เลือกหมวดหมู่ด่วน:</label>
+            <div class="d-flex flex-wrap gap-1">
+              <button type="button" class="btn btn-sm btn-outline-info exp-preset-btn" data-desc="ซื้ออะไหล่/วัสดุสิ้นเปลืองเพิ่มเติม">🔧 ซื้ออะไหล่เพิ่ม</button>
+              <button type="button" class="btn btn-sm btn-outline-warning exp-preset-btn" data-desc="ค่าน้ำ-ค่าไฟฟ้าประจำเดือน">⚡ ค่าน้ำ-ค่าไฟ</button>
+              <button type="button" class="btn btn-sm btn-outline-primary exp-preset-btn" data-desc="ค่าเครื่องมือและอุปกรณ์ซ่อม">🛠️ ค่าเครื่องมือ</button>
+              <button type="button" class="btn btn-sm btn-outline-secondary exp-preset-btn" data-desc="ค่าอาหารและเครื่องดื่มทีมช่าง">☕ สวัสดิการช่าง</button>
+            </div>
+          </div>
           <div class="mb-3">
             <label for="expDescription" class="form-label">คำอธิบายรายการรายจ่าย <span class="text-danger">*</span></label>
-            <input type="text" class="form-control form-glass text-light" id="expDescription" required placeholder="เช่น ซื้อเครื่องมือไฮดรอลิก, ค่าน้ำค่าน้อยรอบเดือนนี้">
+            <input type="text" class="form-control form-glass text-light" id="expDescription" required placeholder="เช่น ซื้อเครื่องมือไฮดรอลิก, ค่าน้ำค่าไฟรอบเดือนนี้">
           </div>
           <div class="mb-3">
             <label for="expAmount" class="form-label">จำนวนเงินจ่ายสุทธิ (บาท) <span class="text-danger">*</span></label>
@@ -315,7 +386,7 @@
   </div>
 </div>
 
-<!-- Record Income Modal (Receive payment for repair job) -->
+
 <div class="modal fade" id="recordIncomeModal" tabindex="-1" aria-labelledby="recordIncomeModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content text-light" style="background: var(--bg-color); border: 1px solid var(--card-border); border-radius: 16px; backdrop-filter: var(--glass-blur);">
@@ -349,7 +420,7 @@
             </select>
           </div>
 
-          <!-- Bank Slip Upload Zone -->
+          
           <div id="slipUploadZone" class="mb-3 d-none">
             <label class="form-label text-muted small"><i class="fa-solid fa-file-image text-info me-1"></i> อัปโหลดรูปภาพสลิปโอนเงิน (สแกนอัตโนมัติ)</label>
             <div class="border border-dashed border-secondary border-opacity-50 rounded-3 p-3 text-center position-relative" id="slipDropArea" style="background: rgba(255, 255, 255, 0.02); cursor: pointer; transition: all 0.2s;">
@@ -372,7 +443,7 @@
                 <button type="button" class="btn btn-sm btn-outline-danger mt-2 py-0.5 px-2" id="clearSlipBtn" style="font-size: 0.72rem;">ลบรูปภาพสลิป</button>
               </div>
             </div>
-            <!-- Preview slip image -->
+            
             <div id="slipPreviewContainer" class="d-none mt-2 text-center">
               <img id="slipPreviewImg" src="" alt="สลิปโอนเงิน" class="img-thumbnail rounded-3" style="max-height: 150px; background: rgba(0,0,0,0.5); border-color: rgba(255,255,255,0.15);">
             </div>
@@ -387,7 +458,7 @@
             </select>
           </div>
 
-          <!-- Installment Terms Input Group -->
+          
           <div class="mb-3 d-none" id="installmentTermsGroup">
             <label for="incInstallmentTerms" class="form-label">ระยะเวลาผ่อนชำระ <span class="text-danger">*</span></label>
             <select class="form-select form-glass text-light" id="incInstallmentTerms">
@@ -409,10 +480,10 @@
   </div>
 </div>
 
-<!-- Load Tesseract.js OCR Engine -->
+
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 
-<!-- AJAX JS Scripts -->
+
 <script>
   document.addEventListener('DOMContentLoaded', function() {
     
@@ -876,12 +947,120 @@
     renderFinancesCharts();
     registerFinanceListeners();
 
+    // Quick Expense Preset Buttons
+    document.querySelectorAll('.exp-preset-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        document.getElementById('expDescription').value = this.dataset.desc;
+        document.getElementById('expAmount').focus();
+      });
+    });
+
+    // 1-Click Settle Pending / Installment Payment
+    document.body.addEventListener('click', function(e) {
+      const settleBtn = e.target.closest('.settle-tx-btn');
+      if (settleBtn) {
+        const id = settleBtn.dataset.id;
+        const amt = parseFloat(settleBtn.dataset.amount || 0).toLocaleString('th-TH', { minimumFractionDigits: 2 });
+        if (!confirm(`ยืนยันการรับชำระเงินและปิดยอดจำนวน ${amt} บาท ใช่หรือไม่?`)) return;
+
+        fetch(`/finances/settle/${id}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ payment_method: 'transfer' })
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            alert('✅ ' + data.message);
+            window.location.reload();
+          } else {
+            alert('⚠️ ' + data.message);
+          }
+        })
+        .catch(() => alert('เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์'));
+      }
+
+      const qrBtn = e.target.closest('.quick-qr-btn');
+      if (qrBtn) {
+        const id = qrBtn.dataset.id;
+        const amount = parseFloat(qrBtn.dataset.amount || 0);
+        const desc = qrBtn.dataset.desc || '';
+        const modalEl = document.getElementById('quickQrModal');
+        const modal = new bootstrap.Modal(modalEl);
+
+        document.getElementById('quickQrDesc').textContent = desc;
+        document.getElementById('quickQrAmount').textContent = amount.toLocaleString('th-TH', { minimumFractionDigits: 2 }) + ' บาท';
+        document.getElementById('quickQrImg').src = '';
+        document.getElementById('quickQrLoading').classList.remove('d-none');
+        document.getElementById('quickQrSettleBtn').dataset.id = id;
+        modal.show();
+
+        fetch(`/qr/promptpay?amount=${amount}`)
+          .then(res => res.json())
+          .then(data => {
+            document.getElementById('quickQrLoading').classList.add('d-none');
+            if (data.success) {
+              document.getElementById('quickQrImg').src = data.qrDataUrl;
+              document.getElementById('quickQrTarget').textContent = `พร้อมเพย์: ${data.target} (${data.recipientName})`;
+            }
+          });
+      }
+    });
+
+    const quickQrSettleBtn = document.getElementById('quickQrSettleBtn');
+    if (quickQrSettleBtn) {
+      quickQrSettleBtn.addEventListener('click', function() {
+        const id = this.dataset.id;
+        if (!id) return;
+        fetch(`/finances/settle/${id}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ payment_method: 'qr' })
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            alert('✅ ' + data.message);
+            window.location.reload();
+          } else {
+            alert('⚠️ ' + data.message);
+          }
+        });
+      });
+    }
+
   });
 </script>
 
+
+<div class="modal fade" id="quickQrModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content text-light text-center" style="background: rgba(18, 22, 36, 0.98); border: 1px solid rgba(255, 193, 7, 0.4); border-radius: 16px;">
+      <div class="modal-header border-secondary border-opacity-25">
+        <h6 class="modal-title fw-bold"><i class="fa-solid fa-qrcode text-warning me-2"></i>สแกนรับชำระ PromptPay</h6>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body p-3">
+        <div class="small text-muted mb-1" id="quickQrDesc">-</div>
+        <div class="h4 fw-bold text-success font-monospace mb-3" id="quickQrAmount">0.00 บาท</div>
+        <div class="bg-white p-2 rounded-3 d-inline-block mb-2">
+          <div id="quickQrLoading" class="p-4 text-dark small">กำลังสร้าง QR...</div>
+          <img id="quickQrImg" src="" alt="PromptPay QR" style="max-width: 210px;">
+        </div>
+        <div class="text-xs text-info mt-1" id="quickQrTarget">-</div>
+      </div>
+      <div class="modal-footer border-secondary border-opacity-25 justify-content-center">
+        <button type="button" class="btn btn-glass-success w-100" id="quickQrSettleBtn">
+          <i class="fa-solid fa-circle-check me-1"></i> ยืนยันได้รับเงินแล้ว (ปิดยอด)
+        </button>
+      </div>
+    </div>
+  </div>
 </div>
 
-<!-- ChartJS CDN -->
+</div>
+
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <%- include('../partials/footer') %>

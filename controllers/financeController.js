@@ -1,6 +1,6 @@
 const db = require('../config/db');
 
-// Get all incomes and expenses with advanced filters, search, and date periods
+
 const getAllFinances = async (req, res) => {
   let dateFrom = req.query.date_from || '';
   let dateTo = req.query.date_to || '';
@@ -8,7 +8,7 @@ const getAllFinances = async (req, res) => {
   const filterOption = req.query.filter_option || '';
   const search = req.query.search || '';
 
-  // Parse unified filter option
+
   let type = '';
   let status = '';
   let paymentMethod = '';
@@ -19,10 +19,10 @@ const getAllFinances = async (req, res) => {
     if (key === 'method') paymentMethod = val;
   }
 
-  // 1. Handle Quick Date Range Buttons (Period)
+
   if (period) {
     const today = new Date();
-    // Helper to format date as YYYY-MM-DD local time
+
     const formatDate = (date) => {
       const offset = date.getTimezoneOffset();
       const localDate = new Date(date.getTime() - (offset * 60 * 1000));
@@ -35,7 +35,7 @@ const getAllFinances = async (req, res) => {
       dateTo = todayStr;
     } else if (period === 'this_week') {
       const day = today.getDay();
-      // Monday of current week
+
       const diffToMonday = today.getDate() - day + (day === 0 ? -6 : 1);
       const monday = new Date(today.setDate(diffToMonday));
       const sunday = new Date(monday);
@@ -64,7 +64,7 @@ const getAllFinances = async (req, res) => {
   }
 
   try {
-    // 2. Build Transaction Query with Filters
+
     let sql = `
       SELECT f.*, r.id AS repair_code, v.license_plate, c.fullname AS customer_name, c.phone AS customer_phone 
       FROM finances f
@@ -75,25 +75,25 @@ const getAllFinances = async (req, res) => {
     `;
     const params = [];
 
-    // Filter by type
+
     if (type) {
       sql += ' AND f.type = ?';
       params.push(type);
     }
 
-    // Filter by status
+
     if (status) {
       sql += ' AND f.status = ?';
       params.push(status);
     }
 
-    // Filter by payment method
+
     if (paymentMethod) {
       sql += ' AND f.payment_method = ?';
       params.push(paymentMethod);
     }
 
-    // Filter by date ranges
+
     if (dateFrom) {
       sql += ' AND f.transaction_date >= ?';
       params.push(dateFrom);
@@ -103,7 +103,7 @@ const getAllFinances = async (req, res) => {
       params.push(dateTo);
     }
 
-    // Filter by Smart Search
+
     if (search) {
       sql += ` AND (
         f.id = ? 
@@ -113,7 +113,7 @@ const getAllFinances = async (req, res) => {
         OR f.description LIKE ?
       )`;
       const searchLike = `%${search}%`;
-      const searchInt = parseInt(search) || 0; // Check if search is numeric id
+      const searchInt = parseInt(search) || 0;
       params.push(searchInt, searchLike, searchLike, searchLike, searchLike);
     }
 
@@ -121,7 +121,7 @@ const getAllFinances = async (req, res) => {
 
     const [rows] = await db.query(sql, params);
 
-    // 3. Calculate Sums dynamically based on current query results (Real-time totals)
+
     let totalIncome = 0;
     let totalExpense = 0;
     let totalPending = 0;
@@ -138,14 +138,14 @@ const getAllFinances = async (req, res) => {
           totalCancelled += amt;
         }
       } else if (t.type === 'expense') {
-        // Expense is generally paid immediately
+
         totalExpense += amt;
       }
     });
 
     const netProfit = totalIncome - totalExpense;
 
-    // Calculate Payment Methods sums dynamically for the doughnut chart
+
     let cashSum = 0, transferSum = 0, qrSum = 0;
     rows.forEach(t => {
       if (t.status === 'paid' && t.type === 'income') {
@@ -156,7 +156,7 @@ const getAllFinances = async (req, res) => {
       }
     });
 
-    // 4. Get list of repairs that are "ready" (completed repair, waiting for payment) to collect payment in the select dropdown
+
     const [pendingPayments] = await db.query(`
       SELECT r.id, r.actual_cost, v.license_plate, c.fullname AS owner_name 
       FROM repairs r
@@ -166,7 +166,7 @@ const getAllFinances = async (req, res) => {
       ORDER BY r.id DESC
     `);
 
-    // 5. Dynamic Chart Data based on current date filters
+
     const d1 = new Date(dateFrom);
     const d2 = new Date(dateTo);
     const timeDiff = Math.abs(d2.getTime() - d1.getTime());
@@ -176,7 +176,7 @@ const getAllFinances = async (req, res) => {
     let trendParams = [dateFrom + ' 00:00:00', dateTo + ' 23:59:59'];
 
     if (diffDays <= 1) {
-      // Group by Hour for single day (Today)
+
       trendQuery = `
         SELECT DATE_FORMAT(transaction_date, '%H:00') AS label,
                SUM(CASE WHEN type = 'income' AND status = 'paid' THEN amount ELSE 0 END) AS income,
@@ -187,7 +187,7 @@ const getAllFinances = async (req, res) => {
         ORDER BY label ASC
       `;
     } else if (diffDays <= 31) {
-      // Group by Day for Week/Month range
+
       trendQuery = `
         SELECT DATE_FORMAT(transaction_date, '%d/%m') AS label,
                SUM(CASE WHEN type = 'income' AND status = 'paid' THEN amount ELSE 0 END) AS income,
@@ -198,7 +198,7 @@ const getAllFinances = async (req, res) => {
         ORDER BY MIN(transaction_date) ASC
       `;
     } else {
-      // Group by Month for longer ranges
+
       trendQuery = `
         SELECT DATE_FORMAT(transaction_date, '%m/%Y') AS label,
                SUM(CASE WHEN type = 'income' AND status = 'paid' THEN amount ELSE 0 END) AS income,
@@ -226,7 +226,7 @@ const getAllFinances = async (req, res) => {
       if (lbl.includes('/')) {
         const parts = lbl.split('/');
         if (parts[1] && parts[1].length === 4) {
-          // It's MM/YYYY
+
           lbl = `${monthNamesThai[parts[0]] || parts[0]} ${parts[1].substring(2)}`;
         }
       }
@@ -276,7 +276,7 @@ const getAllFinances = async (req, res) => {
   }
 };
 
-// Record/collect payment for repair job (Income)
+
 const recordIncome = async (req, res) => {
   const { repair_id, payment_method, status, installment_terms } = req.body;
 
@@ -288,7 +288,7 @@ const recordIncome = async (req, res) => {
   try {
     await conn.beginTransaction();
 
-    // 1. Fetch repair job details
+
     const [[repair]] = await conn.query(`
       SELECT r.*, v.license_plate, c.fullname AS owner_name 
       FROM repairs r
@@ -306,7 +306,7 @@ const recordIncome = async (req, res) => {
     const paymentStatus = (status && ['paid', 'installment', 'pending'].includes(status)) ? status : 'paid';
     const terms = paymentStatus === 'installment' ? (installment_terms || null) : null;
 
-    // 2. Insert into finances
+
     const insertSql = `
       INSERT INTO finances (repair_id, type, amount, payment_method, status, installment_terms, description, transaction_date) 
       VALUES (?, 'income', ?, ?, ?, ?, ?, ?)
@@ -316,10 +316,10 @@ const recordIncome = async (req, res) => {
 
     await conn.query(insertSql, [repair_id, actualCost, payment_method, paymentStatus, terms, desc, currentDate]);
 
-    // 3. Update repair job status to 'completed'
+
     await conn.query("UPDATE repairs SET status = 'completed' WHERE id = ?", [repair_id]);
 
-    // 4. Add log entry
+
     const methodText = payment_method === 'cash' ? 'เงินสด' : payment_method === 'transfer' ? 'โอนผ่านบัญชีธนาคาร' : 'QR Code';
     await conn.query(`
       INSERT INTO repair_logs (repair_id, status, notes, updated_by) 
@@ -337,7 +337,7 @@ const recordIncome = async (req, res) => {
   }
 };
 
-// Record new general expense (Expense)
+
 const recordExpense = async (req, res) => {
   const { amount, description, payment_method, transaction_date } = req.body;
 
@@ -364,8 +364,122 @@ const recordExpense = async (req, res) => {
   }
 };
 
+
+const settlePayment = async (req, res) => {
+  const { id } = req.params;
+  const { payment_method } = req.body;
+
+  try {
+    const [[tx]] = await db.query('SELECT * FROM finances WHERE id = ?', [id]);
+    if (!tx) {
+      return res.status(404).json({ success: false, message: 'ไม่พบรายการธุรกรรมนี้' });
+    }
+    if (tx.status === 'paid') {
+      return res.status(400).json({ success: false, message: 'รายการนี้ชำระเงินเรียบร้อยแล้ว' });
+    }
+
+    const method = ['cash', 'transfer', 'qr'].includes(payment_method) ? payment_method : (tx.payment_method || 'qr');
+    await db.query("UPDATE finances SET status = 'paid', payment_method = ? WHERE id = ?", [method, id]);
+
+    if (tx.repair_id) {
+      await db.query("UPDATE repairs SET status = 'completed' WHERE id = ? AND status = 'ready'", [tx.repair_id]);
+      const methodLabel = method === 'cash' ? 'เงินสด' : method === 'transfer' ? 'โอนเงิน' : 'QR PromptPay';
+      await db.query(
+        'INSERT INTO repair_logs (repair_id, status, notes, updated_by) VALUES (?, ?, ?, ?)',
+        [tx.repair_id, 'completed', `ปิดยอดรับชำระเงินจำนวน ${parseFloat(tx.amount).toLocaleString()} บาท ผ่าน [${methodLabel}]`, req.session.user.id]
+      );
+    }
+
+    res.json({ success: true, message: `ปิดยอดรับชำระเงินจำนวน ${parseFloat(tx.amount).toLocaleString()} บาท เรียบร้อยแล้ว!` });
+  } catch (err) {
+    console.error('Settle Payment Error:', err);
+    res.status(500).json({ success: false, message: 'เกิดข้อผิดพลาดในการปิดยอดชำระเงิน' });
+  }
+};
+
+
+const exportFinancesCsv = async (req, res) => {
+  const dateFrom = req.query.date_from || '';
+  const dateTo = req.query.date_to || '';
+  const filterOption = req.query.filter_option || '';
+  const search = req.query.search || '';
+
+  let type = '';
+  let status = '';
+  let paymentMethod = '';
+  if (filterOption) {
+    const [key, val] = filterOption.split(':');
+    if (key === 'type') type = val;
+    if (key === 'status') status = val;
+    if (key === 'method') paymentMethod = val;
+  }
+
+  try {
+    let sql = `
+      SELECT f.*, v.license_plate, c.fullname AS customer_name
+      FROM finances f
+      LEFT JOIN repairs r ON f.repair_id = r.id
+      LEFT JOIN vehicles v ON r.vehicle_id = v.id
+      LEFT JOIN customers c ON r.customer_id = c.id
+      WHERE 1=1
+    `;
+    const params = [];
+
+    if (type) { sql += ' AND f.type = ?'; params.push(type); }
+    if (status) { sql += ' AND f.status = ?'; params.push(status); }
+    if (paymentMethod) { sql += ' AND f.payment_method = ?'; params.push(paymentMethod); }
+    if (dateFrom) { sql += ' AND f.transaction_date >= ?'; params.push(dateFrom); }
+    if (dateTo) { sql += ' AND f.transaction_date <= ?'; params.push(dateTo); }
+    if (search) {
+      sql += ' AND (f.id = ? OR c.fullname LIKE ? OR c.phone LIKE ? OR v.license_plate LIKE ? OR f.description LIKE ?)';
+      const s = `%${search}%`;
+      params.push(parseInt(search) || 0, s, s, s, s);
+    }
+    sql += ' ORDER BY f.transaction_date DESC, f.id DESC';
+
+    const [rows] = await db.query(sql, params);
+
+    const escapeCsv = (val) => `"${String(val || '').replace(/"/g, '""')}"`;
+    const headers = ['เลขที่เอกสาร', 'วันที่', 'ประเภท', 'รายละเอียด', 'ทะเบียนรถ', 'ลูกค้า', 'วิธีชำระเงิน', 'สถานะ', 'จำนวนเงิน (บาท)'];
+    const lines = [headers.map(escapeCsv).join(',')];
+
+    rows.forEach(t => {
+      const docNo = `#INV-${t.repair_id ? t.repair_id : 'GEN-' + t.id}`;
+      const dateStr = new Date(t.transaction_date).toLocaleDateString('th-TH');
+      const typeStr = t.type === 'income' ? 'รายรับ' : 'รายจ่าย';
+      const methodStr = t.payment_method === 'cash' ? 'เงินสด' : t.payment_method === 'transfer' ? 'โอนเงิน' : 'QR Code';
+      const statusMap = { paid: 'ชำระแล้ว', pending: 'ค้างชำระ', installment: 'ผ่อนชำระ', cancelled: 'ยกเลิก' };
+      const amtStr = (t.type === 'income' ? '' : '-') + parseFloat(t.amount || 0).toFixed(2);
+
+      lines.push([
+        docNo,
+        dateStr,
+        typeStr,
+        t.description || '-',
+        t.license_plate || '-',
+        t.customer_name || '-',
+        methodStr,
+        statusMap[t.status] || t.status,
+        amtStr
+      ].map(escapeCsv).join(','));
+    });
+
+    const csvContent = '\uFEFF' + lines.join('\r\n');
+    const filename = `garageflow_finances_${new Date().toISOString().split('T')[0]}.csv`;
+
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    res.send(csvContent);
+  } catch (err) {
+    console.error('Export Finance CSV Error:', err);
+    res.status(500).send('เกิดข้อผิดพลาดในการส่งออกไฟล์รายงานการเงิน');
+  }
+};
+
 module.exports = {
   getAllFinances,
   recordIncome,
-  recordExpense
+  recordExpense,
+  settlePayment,
+  exportFinancesCsv
 };

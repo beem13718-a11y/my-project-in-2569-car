@@ -19,10 +19,15 @@ CREATE TABLE IF NOT EXISTS users (
     username VARCHAR(50) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
     fullname VARCHAR(100) NOT NULL,
-    role ENUM('owner', 'mechanic') NOT NULL,
+    role ENUM('owner', 'mechanic', 'receptionist', 'inventory') NOT NULL,
     phone VARCHAR(20),
     skills VARCHAR(255) DEFAULT NULL,
     status ENUM('active', 'inactive') DEFAULT 'active',
+    salary_type ENUM('daily', 'monthly') DEFAULT 'daily',
+    salary_rate DECIMAL(10, 2) DEFAULT 500.00,
+    overtime_rate DECIMAL(10, 2) DEFAULT 60.00,
+    reset_token VARCHAR(100) DEFAULT NULL,
+    reset_expires DATETIME DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -131,6 +136,22 @@ CREATE TABLE IF NOT EXISTS audit_logs (
     action VARCHAR(100) NOT NULL,
     details TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- 10. Attendances Table (Daily Staff Attendance & QR Check-in)
+CREATE TABLE IF NOT EXISTS attendances (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    work_date DATE NOT NULL,
+    clock_in DATETIME DEFAULT NULL,
+    clock_out DATETIME DEFAULT NULL,
+    ot_hours DECIMAL(4, 2) DEFAULT 0.00,
+    status ENUM('present', 'late', 'leave_sick', 'leave_business', 'leave_vacation', 'absent') DEFAULT 'present',
+    notes TEXT DEFAULT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY unique_user_date (user_id, work_date),
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 

@@ -3,18 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><%= typeof title !== 'undefined' ? title + ' | BT Auto (GarageFlow)' : 'BT Auto (GarageFlow) - ระบบจัดการอู่ซ่อมรถยนต์' %></title>
+  <title><%= typeof title !== 'undefined' ? title + ' | สมาร์ทการาจ (SmartGarage)' : 'สมาร์ทการาจ (SmartGarage) - ระบบจัดการอู่ซ่อมรถยนต์' %></title>
   
-  <!-- Bootstrap 5 CSS -->
+  
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
   
-  <!-- Font Awesome 6 (Free) -->
+  
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
   
-  <!-- Custom CSS -->
+  
   <link rel="stylesheet" href="/css/style.css">
 
-  <!-- Instant Theme Initializer (Pre-render to prevent white/dark flashes) -->
+  
   <script>
     (function() {
       const savedTheme = localStorage.getItem('garageflow_theme') || 'dark';
@@ -25,25 +25,25 @@
 <body>
   
   <div class="app-container">
-    <!-- Include Sidebar -->
+    
     <%- include('sidebar') %>
 
-    <!-- Main Content Area -->
+    
     <div class="main-content">
       
-      <!-- Top Header Navbar -->
+      
       <header class="top-header">
         <div class="d-flex align-items-center gap-3">
           <button class="sidebar-toggle" id="sidebarToggleBtn">
             <i class="fa-solid fa-bars"></i>
           </button>
           <div class="h5 m-0 text-main font-weight-bold d-flex align-items-center gap-2">
-            <i class="fa-solid fa-car-burst text-primary" style="font-size: 1.3rem; filter: drop-shadow(0 0 5px rgba(255, 107, 0, 0.4));"></i>
-            <span style="background: linear-gradient(135deg, var(--neon-primary), #FFE600); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800; letter-spacing: 0.5px;">GarageFlow</span>
+            <i class="fa-solid fa-shield-halved text-info" style="font-size: 1.3rem;"></i>
+            <span style="background: linear-gradient(135deg, #38bdf8, #34d399); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800; letter-spacing: 0.5px;">SmartGarage</span>
           </div>
         </div>
 
-        <!-- Horizontal Top Navbar for Desktop -->
+        
         <nav class="top-nav d-none d-lg-flex align-items-center gap-2 mx-auto">
           <a href="/dashboard" class="top-nav-link <%= typeof activePage !== 'undefined' && activePage === 'dashboard' ? 'active' : '' %>">
             <i class="fa-solid fa-chart-line text-primary"></i> แผงควบคุม
@@ -74,13 +74,13 @@
         </nav>
         
         <div class="header-right d-flex align-items-center gap-2">
-          <!-- Light / Dark Theme Switcher Button -->
+          
           <button type="button" class="btn btn-glass-secondary py-1 px-2.5 d-flex align-items-center gap-1.5 shadow-sm" id="themeToggleBtn" title="สลับโหมดมืด / สว่าง (Dark / Light Theme)" style="border-radius: 8px; font-size: 0.82rem; height: 34px;">
             <i class="fa-solid fa-moon text-warning" id="themeIcon"></i>
             <span class="d-none d-sm-inline small" id="themeLabel">โหมดมืด</span>
           </button>
 
-          <!-- Notification Bell -->
+          
           <div class="notifications-dropdown">
             <button class="notifications-trigger" title="ระบบแจ้งเตือน">
               <i class="fa-solid fa-bell"></i>
@@ -88,9 +88,35 @@
             </button>
           </div>
           
-          <!-- User Details / Role Badge -->
+          
           <% if (typeof user !== 'undefined' && user) { 
             let cleanFullname = (user.fullname || '').replace(/\s*\([^)]*\)/g, '').trim();
+            let roleLabel = 'ผู้ใช้งาน';
+            let roleLetter = 'ผ';
+            let roleBg = 'linear-gradient(135deg, #00E5FF, #0055FF)';
+            let badgeClass = 'bg-secondary bg-opacity-25 text-light border border-secondary';
+
+            if (user.role === 'owner') {
+              roleLabel = 'เจ้าของอู่ / ผู้ดูแลระบบ';
+              roleLetter = 'จ';
+              roleBg = 'linear-gradient(135deg, #FF3D00, #FFE600)';
+              badgeClass = 'bg-warning bg-opacity-25 text-warning border border-warning';
+            } else if (user.role === 'mechanic') {
+              roleLabel = 'ช่างซ่อมบำรุง';
+              roleLetter = 'ช';
+              roleBg = 'linear-gradient(135deg, #00E5FF, #0055FF)';
+              badgeClass = 'bg-info bg-opacity-25 text-info border border-info';
+            } else if (user.role === 'receptionist') {
+              roleLabel = 'พนักงานต้อนรับ/การเงิน';
+              roleLetter = 'ต';
+              roleBg = 'linear-gradient(135deg, #FF9100, #FFEA00)';
+              badgeClass = 'bg-warning bg-opacity-25 text-warning border border-warning';
+            } else if (user.role === 'inventory') {
+              roleLabel = 'เจ้าหน้าที่คลังอะไหล่';
+              roleLetter = 'ค';
+              roleBg = 'linear-gradient(135deg, #00E676, #00B0FF)';
+              badgeClass = 'bg-success bg-opacity-25 text-success border border-success';
+            }
           %>
             <div class="dropdown">
               <button class="btn btn-glass-primary dropdown-toggle d-flex align-items-center gap-2 py-1.5" 
@@ -99,25 +125,19 @@
                       type="button" id="userMenuDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                 <div class="user-avatar d-flex align-items-center justify-content-center" 
                      style="width: 26px; height: 26px; font-size: 0.75rem; border-radius: 6px; box-shadow: none; 
-                            background: <%= user.role === 'owner' ? 'linear-gradient(135deg, #FF3D00, #FFE600)' : 'linear-gradient(135deg, #00E5FF, #0055FF)' %>; 
+                            background: <%= roleBg %>; 
                             color: #fff; font-weight: bold; text-shadow: 0 1px 2px rgba(0,0,0,0.3);">
-                  <%= user.role === 'owner' ? 'จ' : 'ช' %>
+                  <%= roleLetter %>
                 </div>
                 <span class="small fw-semibold text-light"><%= cleanFullname %></span>
               </button>
-              <ul class="dropdown-menu dropdown-menu-end text-light" aria-labelledby="userMenuDropdown" style="background: rgba(14, 16, 22, 0.95); border: 1px solid var(--card-border); backdrop-filter: var(--glass-blur); min-width: 200px;">
+              <ul class="dropdown-menu dropdown-menu-end text-light" aria-labelledby="userMenuDropdown" style="background: rgba(14, 16, 22, 0.95); border: 1px solid var(--card-border); backdrop-filter: var(--glass-blur); min-width: 210px;">
                 <li class="px-3 py-2 border-bottom border-secondary border-opacity-25 mb-1">
                   <div class="small text-muted" style="font-size: 0.75rem;">ผู้ปฏิบัติงาน:</div>
                   <div class="fw-bold text-light" style="font-size: 0.88rem;"><%= cleanFullname %></div>
-                  <% if (user.role === 'owner') { %>
-                    <span class="badge mt-1" style="background-color: rgba(255, 196, 0, 0.15) !important; color: #FFF0B3 !important; border: 1px solid rgba(255, 196, 0, 0.4) !important; font-size: 0.7rem; font-weight: 600; padding: 3px 8px;">
-                      เจ้าของอู่
-                    </span>
-                  <% } else { %>
-                    <span class="badge mt-1" style="background-color: rgba(0, 229, 255, 0.15) !important; color: #E0F7FA !important; border: 1px solid rgba(0, 229, 255, 0.4) !important; font-size: 0.7rem; font-weight: 600; padding: 3px 8px;">
-                      ช่างซ่อม
-                    </span>
-                  <% } %>
+                  <span class="badge mt-1 <%= badgeClass %>" style="font-size: 0.72rem; font-weight: 600; padding: 3px 8px;">
+                    <%= roleLabel %>
+                  </span>
                 </li>
                 <% if (user.role === 'owner') { %>
                   <li>
@@ -141,5 +161,5 @@
         </div>
       </header>
 
-      <!-- Main Content Body -->
+      
       <main class="content-body">

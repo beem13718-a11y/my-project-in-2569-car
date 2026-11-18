@@ -1,8 +1,9 @@
 const bcrypt = require('bcryptjs');
+const QRCode = require('qrcode');
+const crypto = require('crypto');
 const db = require('../config/db');
 const notificationService = require('../services/notificationService');
 
-// Format date to YYYY-MM-DD
 const formatDate = (d) => {
   const date = d ? new Date(d) : new Date();
   const year = date.getFullYear();
@@ -11,21 +12,33 @@ const formatDate = (d) => {
   return `${year}-${month}-${day}`;
 };
 
-// Render Attendance Dashboard (ลูกจ้าง/ช่างเท่านั้น)
+const getRollingMinuteToken = (offsetMinutes = 0) => {
+  const secretKey = process.env.SESSION_SECRET || 'garageflow-secret-key-2026';
+  const now = new Date();
+
+  const windowTime = Math.floor(now.getTime() / (60 * 1000)) + offsetMinutes;
+  return crypto.createHmac('sha256', secretKey).update(`qr-window-${windowTime}`).digest('hex').substring(0, 16);
+};
+
+const isValidRollingToken = (token) => {
+  const current = getRollingMinuteToken(0);
+  const prev = getRollingMinuteToken(-1);
+  return token === current || token === prev;
+};
+
 const getAttendancePage = async (req, res) => {
   const selectedDate = req.query.date ? req.query.date : formatDate();
   const isOwner = req.session.user.role === 'owner';
 
   try {
-    // 1. Fetch only employees/mechanics (ไม่รวมเจ้าของร้าน)
+
     const [staffList] = await db.query(`
-      SELECT id, username, fullname, role, phone, skills, status 
-      FROM users 
+      SELECT id, username, fullname, role, phone, skills, status
+      FROM users
       WHERE role != 'owner' AND status = 'active'
       ORDER BY fullname ASC
     `);
 
-    // 2. Fetch attendance records for the selected date
     const [attendanceRows] = await db.query(`
       SELECT a.*, u.fullname, u.username, u.role, u.phone
       FROM attendances a
@@ -33,13 +46,11 @@ const getAttendancePage = async (req, res) => {
       WHERE a.work_date = ? AND u.role != 'owner'
     `, [selectedDate]);
 
-    // Map attendance by user_id
     const attendanceMap = {};
     attendanceRows.forEach(a => {
       attendanceMap[a.user_id] = a;
     });
 
-    // 3. Combine staff list with their attendance status for today
     const fullStaffStatus = staffList.map(s => {
       const att = attendanceMap[s.id] || null;
       let status = 'not_clocked_in';
@@ -53,7 +64,6 @@ const getAttendancePage = async (req, res) => {
       };
     });
 
-    // 4. Calculate summary metrics (นับเฉพาะลูกจ้าง)
     const presentCount = attendanceRows.filter(a => a.status === 'present').length;
     const lateCount = attendanceRows.filter(a => a.status === 'late').length;
     const leaveCount = attendanceRows.filter(a => a.status.startsWith('leave')).length;
@@ -69,9 +79,8 @@ const getAttendancePage = async (req, res) => {
       notClockedInCount: notClockedInCount
     };
 
-    // 5. Recent Logs
     const [recentLogs] = await db.query(`
-      SELECT a.*, u.fullname, u.role 
+      SELECT a.*, u.fullname, u.role
       FROM attendances a
       JOIN users u ON a.user_id = u.id
       WHERE u.role != 'owner'
@@ -100,9 +109,8 @@ const getAttendancePage = async (req, res) => {
   }
 };
 
-// Quick 1-Click Update from Table (Owner Action)
 const quickUpdateStatus = async (req, res) => {
-  const { user_id, work_date, status, clock_in_time, clock_out_time, notes } = req.body;
+  const { user_id, work_date, status, clock_in_time, clock_out_time, ot_hours, notes } = req.body;
   const targetDate = work_date || formatDate();
 
   if (!user_id || !status) {
@@ -112,8 +120,8 @@ const quickUpdateStatus = async (req, res) => {
   try {
     let clockInVal = null;
     let clockOutVal = null;
+    const parsedOt = parseFloat(ot_hours) || 0.00;
 
-    // Set default times based on status if not manually provided
     if (status === 'present') {
       clockInVal = clock_in_time ? `${targetDate} ${clock_in_time}` : `${targetDate} 08:30:00`;
       if (clock_out_time) clockOutVal = `${targetDate} ${clock_out_time}`;
@@ -126,16 +134,17 @@ const quickUpdateStatus = async (req, res) => {
     }
 
     const sql = `
-      INSERT INTO attendances (user_id, work_date, clock_in, clock_out, status, notes)
-      VALUES (?, ?, ?, ?, ?, ?)
-      ON DUPLICATE KEY UPDATE 
+      INSERT INTO attendances (user_id, work_date, clock_in, clock_out, ot_hours, status, notes)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+      ON DUPLICATE KEY UPDATE
         clock_in = VALUES(clock_in),
         clock_out = VALUES(clock_out),
+        ot_hours = VALUES(ot_hours),
         status = VALUES(status),
         notes = VALUES(notes)
     `;
 
-    await db.query(sql, [user_id, targetDate, clockInVal, clockOutVal, status, notes || null]);
+    await db.query(sql, [user_id, targetDate, clockInVal, clockOutVal, parsedOt, status, notes || null]);
 
     const [[staff]] = await db.query('SELECT fullname FROM users WHERE id = ?', [user_id]);
 
@@ -148,9 +157,9 @@ const quickUpdateStatus = async (req, res) => {
       'absent': '❌ ขาดงาน'
     };
 
-    res.json({ 
-      success: true, 
-      message: `บันทึกสถานะของ "${staff.fullname}" เป็น ${statusNames[status] || status} สำเร็จ!` 
+    res.json({
+      success: true,
+      message: `บันทึกสถานะของ "${staff.fullname}" เป็น ${statusNames[status] || status} สำเร็จ!`
     });
   } catch (err) {
     console.error('Quick Update Attendance Error:', err);
@@ -158,17 +167,15 @@ const quickUpdateStatus = async (req, res) => {
   }
 };
 
-// Clock-in Action (สำหรับลูกจ้างกดเอง หรือเจ้าของลงให้)
 const clockIn = async (req, res) => {
   const userId = req.body.user_id || req.session.user.id;
   const today = formatDate();
-  const selectedTime = req.body.custom_time; // HH:MM or undefined
+  const selectedTime = req.body.custom_time;
   const now = new Date();
 
   let timeStr = selectedTime ? `${selectedTime}:00` : now.toTimeString().split(' ')[0];
   const nowFull = `${today} ${timeStr}`;
 
-  // If time is after 08:30 -> late
   const checkHour = selectedTime ? parseInt(selectedTime.split(':')[0]) : now.getHours();
   const checkMin = selectedTime ? parseInt(selectedTime.split(':')[1]) : now.getMinutes();
   const isLate = (checkHour > 8 || (checkHour === 8 && checkMin > 30));
@@ -176,10 +183,10 @@ const clockIn = async (req, res) => {
 
   try {
     const [[existing]] = await db.query('SELECT * FROM attendances WHERE user_id = ? AND work_date = ?', [userId, today]);
-    
+
     if (existing) {
       await db.query(`
-        UPDATE attendances 
+        UPDATE attendances
         SET clock_in = ?, status = ?, notes = ?
         WHERE id = ?
       `, [nowFull, status, req.body.notes || existing.notes, existing.id]);
@@ -192,7 +199,6 @@ const clockIn = async (req, res) => {
 
     const [[staff]] = await db.query('SELECT fullname, role FROM users WHERE id = ?', [userId]);
 
-    // Send LINE Notification to Owner
     const lateText = status === 'late' ? '⚠️ (มาสาย)' : '✅ (ตรงเวลา)';
     const lineMsg = {
       type: 'text',
@@ -200,8 +206,8 @@ const clockIn = async (req, res) => {
     };
     notificationService.sendToAdmin([lineMsg]).catch(() => {});
 
-    res.json({ 
-      success: true, 
+    res.json({
+      success: true,
       message: `บันทึกเวลาเข้างานของ ${staff.fullname} (${timeStr.slice(0, 5)} น.) สำเร็จ!`,
       clockInTime: nowFull,
       status: status
@@ -212,7 +218,6 @@ const clockIn = async (req, res) => {
   }
 };
 
-// Clock-out Action
 const clockOut = async (req, res) => {
   const userId = req.body.user_id || req.session.user.id;
   const today = formatDate();
@@ -231,15 +236,14 @@ const clockOut = async (req, res) => {
 
     const [[staff]] = await db.query('SELECT fullname FROM users WHERE id = ?', [userId]);
 
-    // Send LINE notification to Owner
     const lineMsg = {
       type: 'text',
       text: `🏁 [ลงเวลาออกงาน - BT Auto]\n• ลูกจ้าง: คุณ ${staff.fullname}\n• เวลาออกงาน: ${timeStr.slice(0, 5)} น.\n• วันที่: ${today}`
     };
     notificationService.sendToAdmin([lineMsg]).catch(() => {});
 
-    res.json({ 
-      success: true, 
+    res.json({
+      success: true,
       message: `บันทึกเวลาออกงานของ ${staff.fullname} (${timeStr.slice(0, 5)} น.) สำเร็จ!`
     });
   } catch (err) {
@@ -248,9 +252,8 @@ const clockOut = async (req, res) => {
   }
 };
 
-// Manual Attendance Record / Leave Management (Admin)
 const manualAttendanceRecord = async (req, res) => {
-  const { user_id, work_date, clock_in_time, clock_out_time, status, notes } = req.body;
+  const { user_id, work_date, clock_in_time, clock_out_time, ot_hours, status, notes } = req.body;
 
   if (!user_id || !work_date || !status) {
     return res.status(400).json({ success: false, message: 'กรุณากรอกข้อมูลให้ครบถ้วน' });
@@ -259,6 +262,7 @@ const manualAttendanceRecord = async (req, res) => {
   try {
     let clockInVal = null;
     let clockOutVal = null;
+    const parsedOt = parseFloat(ot_hours) || 0.00;
 
     if (status === 'present' || status === 'late') {
       if (clock_in_time) clockInVal = `${work_date} ${clock_in_time}:00`;
@@ -266,16 +270,17 @@ const manualAttendanceRecord = async (req, res) => {
     }
 
     const sql = `
-      INSERT INTO attendances (user_id, work_date, clock_in, clock_out, status, notes)
-      VALUES (?, ?, ?, ?, ?, ?)
-      ON DUPLICATE KEY UPDATE 
+      INSERT INTO attendances (user_id, work_date, clock_in, clock_out, ot_hours, status, notes)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+      ON DUPLICATE KEY UPDATE
         clock_in = VALUES(clock_in),
         clock_out = VALUES(clock_out),
+        ot_hours = VALUES(ot_hours),
         status = VALUES(status),
         notes = VALUES(notes)
     `;
 
-    await db.query(sql, [user_id, work_date, clockInVal, clockOutVal, status, notes || null]);
+    await db.query(sql, [user_id, work_date, clockInVal, clockOutVal, parsedOt, status, notes || null]);
 
     res.json({ success: true, message: 'บันทึกข้อมูลการเช็คชื่อ/การลาเรียบร้อยแล้ว!' });
   } catch (err) {
@@ -284,7 +289,6 @@ const manualAttendanceRecord = async (req, res) => {
   }
 };
 
-// Verify Owner Password for unlocking past date edits
 const verifyUnlock = async (req, res) => {
   const { password } = req.body;
   const userId = req.session.user.id;
@@ -311,11 +315,217 @@ const verifyUnlock = async (req, res) => {
   }
 };
 
+const getQrKioskPage = async (req, res) => {
+  const today = formatDate();
+  const token = getRollingMinuteToken(0);
+
+  const protocol = req.protocol;
+  const host = req.get('host');
+  const scanUrl = `${protocol}://${host}/attendance/scan?token=${token}`;
+
+  try {
+    const qrDataUrl = await QRCode.toDataURL(scanUrl, {
+      width: 360,
+      margin: 2,
+      color: {
+        dark: '#0f172a',
+        light: '#ffffff'
+      }
+    });
+
+    const [todayRows] = await db.query(`
+      SELECT a.*, u.fullname, u.skills
+      FROM attendances a
+      JOIN users u ON a.user_id = u.id
+      WHERE a.work_date = ?
+      ORDER BY a.clock_in DESC
+    `, [today]);
+
+    res.render('attendance/kiosk', {
+      title: 'Kiosk เช็คชื่อเข้างานประจำวัน - สแกน QR Code',
+      today: today,
+      token: token,
+      qrDataUrl: qrDataUrl,
+      scanUrl: scanUrl,
+      todayRows: todayRows
+    });
+  } catch (err) {
+    console.error('QR Kiosk Error:', err);
+    res.status(500).render('error', { title: 'เกิดข้อผิดพลาด', message: 'ไม่สามารถสร้าง QR Code สำหรับลงเวลาได้' });
+  }
+};
+
+const getQrDataApi = async (req, res) => {
+  const today = formatDate();
+  const token = getRollingMinuteToken(0);
+  const protocol = req.protocol;
+  const host = req.get('host');
+  const scanUrl = `${protocol}://${host}/attendance/scan?token=${token}`;
+
+  try {
+    const qrDataUrl = await QRCode.toDataURL(scanUrl, {
+      width: 360,
+      margin: 2,
+      color: {
+        dark: '#0f172a',
+        light: '#ffffff'
+      }
+    });
+
+    const [todayRows] = await db.query(`
+      SELECT a.*, u.fullname, u.skills
+      FROM attendances a
+      JOIN users u ON a.user_id = u.id
+      WHERE a.work_date = ?
+      ORDER BY a.clock_in DESC
+    `, [today]);
+
+    res.json({
+      success: true,
+      qrDataUrl: qrDataUrl,
+      token: token,
+      scanUrl: scanUrl,
+      checkedCount: todayRows.length,
+      todayRows: todayRows
+    });
+  } catch (err) {
+    console.error('API QR Data Error:', err);
+    res.status(500).json({ success: false, message: 'ไม่สามารถสร้าง QR Code ได้' });
+  }
+};
+
+const getScanPage = async (req, res) => {
+  const { token } = req.query;
+  const today = formatDate();
+
+  if (!token || !isValidRollingToken(token)) {
+    return res.status(403).render('error', {
+      title: 'QR Code หมดอายุ (Expired)',
+      message: 'รหัส QR Code นี้หมดอายุแล้ว (ระบบรีเฟรชรหัสใหม่ทุก 1 นาที) กรุณาสแกนรหัสใหม่จากหน้าจอคอมพิวเตอร์ของร้าน'
+    });
+  }
+
+  try {
+
+    const [mechanics] = await db.query(`
+      SELECT id, fullname, username, skills, phone
+      FROM users
+      WHERE role != 'owner' AND status = 'active'
+      ORDER BY fullname ASC
+    `);
+
+    const [attendances] = await db.query('SELECT user_id, clock_in, clock_out, status FROM attendances WHERE work_date = ?', [today]);
+    const attMap = {};
+    attendances.forEach(a => { attMap[a.user_id] = a; });
+
+    const staffList = mechanics.map(m => ({
+      ...m,
+      attendance: attMap[m.id] || null
+    }));
+
+    res.render('attendance/scan', {
+      title: 'สแกนลงเวลาเข้างานประจำวัน',
+      today: today,
+      token: token,
+      staffList: staffList,
+      currentUser: req.session.user || null
+    });
+  } catch (err) {
+    console.error('Scan Page Error:', err);
+    res.status(500).render('error', { title: 'เกิดข้อผิดพลาด', message: 'ไม่สามารถโหลดหน้าลงเวลาได้' });
+  }
+};
+
+const processScanCheckIn = async (req, res) => {
+  const { user_id, token, notes } = req.body;
+  const today = formatDate();
+
+  if (!token || !isValidRollingToken(token)) {
+    return res.status(403).json({ success: false, message: 'รหัสยืนยัน QR Code หมดอายุแล้ว (กรุณาสแกนใหม่จากหน้าจอ)' });
+  }
+
+  if (!user_id) {
+    return res.status(400).json({ success: false, message: 'กรุณาเลือกช่างที่ต้องการลงเวลา' });
+  }
+
+  const now = new Date();
+  const timeStr = now.toTimeString().split(' ')[0];
+  const nowFull = `${today} ${timeStr}`;
+
+  const isLate = (now.getHours() > 8 || (now.getHours() === 8 && now.getMinutes() > 30));
+  const status = isLate ? 'late' : 'present';
+
+  try {
+    const [[existing]] = await db.query('SELECT * FROM attendances WHERE user_id = ? AND work_date = ?', [user_id, today]);
+
+    if (existing && existing.clock_in) {
+      return res.status(400).json({
+        success: false,
+        message: `คุณได้ลงเวลาเข้างานของวันนี้ไปแล้วเมื่อเวลา ${new Date(existing.clock_in).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' })} น.`
+      });
+    }
+
+    if (existing) {
+      await db.query(`
+        UPDATE attendances
+        SET clock_in = ?, status = ?, notes = ?
+        WHERE id = ?
+      `, [nowFull, status, notes || existing.notes, existing.id]);
+    } else {
+      await db.query(`
+        INSERT INTO attendances (user_id, work_date, clock_in, status, notes)
+        VALUES (?, ?, ?, ?, ?)
+      `, [user_id, today, nowFull, status, notes || null]);
+    }
+
+    const [[staff]] = await db.query('SELECT fullname, role FROM users WHERE id = ?', [user_id]);
+
+    const lateText = status === 'late' ? '⚠️ (มาสาย)' : '✅ (ตรงเวลา)';
+    const lineMsg = {
+      type: 'text',
+      text: `📱 [สแกน QR เข้างาน - BT Auto]\n• ช่าง: คุณ ${staff.fullname}\n• เวลาเข้างาน: ${timeStr.slice(0, 5)} น.\n• สถานะ: ${lateText}\n• วันที่: ${today}`
+    };
+    notificationService.sendToAdmin([lineMsg]).catch(() => {});
+
+    const startOfMonth = today.slice(0, 7) + '-01';
+    const [[monthStats]] = await db.query(`
+      SELECT COUNT(*) as total_days
+      FROM attendances
+      WHERE user_id = ? AND work_date >= ? AND (status = 'present' OR status = 'late')
+    `, [user_id, startOfMonth]);
+
+    const thaiFormattedDate = new Date().toLocaleDateString('th-TH', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+
+    res.json({
+      success: true,
+      message: `ยืนยันตัวตนสำเร็จ! ลงเวลาเข้างานของ "${staff.fullname}" เวลา ${timeStr.slice(0, 5)} น. ${lateText} เรียบร้อยแล้ว`,
+      staffName: staff.fullname,
+      clockInTime: timeStr.slice(0, 5),
+      workDate: today,
+      thaiFormattedDate: thaiFormattedDate,
+      totalDaysThisMonth: monthStats.total_days || 1,
+      status: status
+    });
+  } catch (err) {
+    console.error('Process Scan Error:', err);
+    res.status(500).json({ success: false, message: 'เกิดข้อผิดพลาดในการบันทึกเวลา: ' + err.message });
+  }
+};
+
 module.exports = {
   getAttendancePage,
   clockIn,
   clockOut,
   quickUpdateStatus,
   manualAttendanceRecord,
-  verifyUnlock
+  verifyUnlock,
+  getQrKioskPage,
+  getQrDataApi,
+  getScanPage,
+  processScanCheckIn
 };

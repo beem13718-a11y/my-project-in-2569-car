@@ -2,14 +2,10 @@ const promptpay = require('promptpay-qr');
 const QRCode = require('qrcode');
 const db = require('../config/db');
 
-/**
- * Generate Dynamic PromptPay QR Code
- */
 exports.generatePromptPayQR = async (req, res) => {
   try {
     const { amount, promptpay_target, note } = req.query;
 
-    // Fetch garage default promptpay from settings if not specified
     let target = promptpay_target;
     let recipientName = 'BT Auto Garage';
 
@@ -30,7 +26,6 @@ exports.generatePromptPayQR = async (req, res) => {
       console.warn('[QR] Could not fetch settings:', dbErr.message);
     }
 
-    // Default fallback target if none set
     if (!target) {
       target = '0812345678';
     }
@@ -38,13 +33,12 @@ exports.generatePromptPayQR = async (req, res) => {
     const numAmount = amount ? parseFloat(amount) : 0;
     const payload = promptpay(target, { amount: numAmount > 0 ? numAmount : undefined });
 
-    // Generate QR Code as DataURL (PNG Base64)
     const qrDataUrl = await QRCode.toDataURL(payload, {
       errorCorrectionLevel: 'M',
       margin: 2,
       scale: 8,
       color: {
-        dark: '#002B49', // PromptPay Deep Navy
+        dark: '#002B49',
         light: '#FFFFFF'
       }
     });

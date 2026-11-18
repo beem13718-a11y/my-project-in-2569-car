@@ -1,6 +1,6 @@
 const db = require('../config/db');
 
-// Get all customers with search and pagination
+
 const getAllCustomers = async (req, res) => {
   const search = req.query.search || '';
   const period = req.query.period || '';
@@ -10,7 +10,7 @@ const getAllCustomers = async (req, res) => {
   const limit = 10;
   const offset = (page - 1) * limit;
 
-  // Resolve period dates
+
   let dateFrom = '';
   let dateTo = '';
   const todayStr = new Date().toISOString().slice(0, 10);
@@ -44,7 +44,7 @@ const getAllCustomers = async (req, res) => {
   }
 
   try {
-    // 1. Get total records count for pagination
+
     let countSql = `
       SELECT COUNT(*) AS count FROM customers 
       WHERE (fullname LIKE ? OR phone LIKE ? OR email LIKE ?)
@@ -66,7 +66,7 @@ const getAllCustomers = async (req, res) => {
     const [[{ count }]] = await db.query(countSql, paramsCount);
     const totalPages = Math.ceil(count / limit);
 
-    // 2. Get customer rows
+
     let sql = `
       SELECT * FROM customers 
       WHERE (fullname LIKE ? OR phone LIKE ? OR email LIKE ?)
@@ -110,7 +110,7 @@ const getAllCustomers = async (req, res) => {
   }
 };
 
-// Add new customer
+
 const addCustomer = async (req, res) => {
   const { fullname, phone, email, address, line_id } = req.body;
 
@@ -128,7 +128,7 @@ const addCustomer = async (req, res) => {
   }
 };
 
-// Update customer details
+
 const editCustomer = async (req, res) => {
   const { id } = req.params;
   const { fullname, phone, email, address, line_id } = req.body;
@@ -142,7 +142,7 @@ const editCustomer = async (req, res) => {
     const [result] = await db.query(sql, [fullname, phone, email || null, address || null, line_id || null, id]);
     
     if (result.affectedRows === 0) {
-      return res.status(444).json({ success: false, message: 'ไม่พบข้อมูลลูกค้าที่ต้องการแก้ไข' });
+      return res.status(404).json({ success: false, message: 'ไม่พบข้อมูลลูกค้าที่ต้องการแก้ไข' });
     }
     
     res.json({ success: true, message: 'แก้ไขข้อมูลลูกค้าเรียบร้อยแล้ว' });
@@ -152,7 +152,6 @@ const editCustomer = async (req, res) => {
   }
 };
 
-// Delete customer
 const deleteCustomer = async (req, res) => {
   const { id } = req.params;
 
@@ -161,7 +160,7 @@ const deleteCustomer = async (req, res) => {
     const [result] = await db.query(sql, [id]);
 
     if (result.affectedRows === 0) {
-      return res.status(444).json({ success: false, message: 'ไม่พบข้อมูลลูกค้าที่ต้องการลบ' });
+      return res.status(404).json({ success: false, message: 'ไม่พบข้อมูลลูกค้าที่ต้องการลบ' });
     }
 
     res.json({ success: true, message: 'ลบข้อมูลลูกค้าเรียบร้อยแล้ว' });

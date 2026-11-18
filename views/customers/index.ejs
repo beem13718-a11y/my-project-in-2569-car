@@ -7,16 +7,16 @@
   </button>
 </div>
 
-<!-- Search Bar & Filters -->
+
 <div class="glass-card mb-4 py-3">
   <form action="/customers" method="GET" id="customerFilterForm" class="row g-3 align-items-end">
-    <!-- Search Input -->
+    
     <div class="col-lg-3 col-md-4 col-sm-12">
       <label class="form-label text-muted small"><i class="fa-solid fa-user me-1 text-info"></i> ค้นหาข้อมูลลูกค้า</label>
       <input type="text" class="form-control form-glass" name="search" value="<%= search %>" placeholder="ค้นหาชื่อลูกค้า, เบอร์โทรศัพท์, อีเมล..." style="border-radius: 8px;">
     </div>
     
-    <!-- Registration Period Filter Dropdown -->
+    
     <div class="col-lg-3 col-md-4 col-sm-6">
       <label class="form-label text-muted small"><i class="fa-solid fa-filter me-1 text-warning"></i> กรองตามระยะเวลา</label>
       <select class="form-select form-glass text-light" name="period" id="periodFilter">
@@ -30,19 +30,19 @@
       </select>
     </div>
 
-    <!-- Custom Date From -->
+    
     <div class="col-lg-2 col-md-4 col-sm-6 <%= selectedPeriod === 'custom' ? '' : 'd-none' %>" id="customDateFromGroup">
       <label class="form-label text-muted small"><i class="fa-solid fa-calendar me-1 text-info"></i> จากวันที่</label>
       <input type="date" class="form-control form-glass text-light" name="date_from" id="dateFromFilter" value="<%= dateFrom || '' %>">
     </div>
 
-    <!-- Custom Date To -->
+    
     <div class="col-lg-2 col-md-4 col-sm-6 <%= selectedPeriod === 'custom' ? '' : 'd-none' %>" id="customDateToGroup">
       <label class="form-label text-muted small"><i class="fa-solid fa-calendar me-1 text-info"></i> ถึงวันที่</label>
       <input type="date" class="form-control form-glass text-light" name="date_to" id="dateToFilter" value="<%= dateTo || '' %>">
     </div>
 
-    <!-- Search Button -->
+    
     <div class="col-lg-2 col-md-4 col-sm-12 d-grid">
       <button type="submit" class="btn btn-glass-primary">
         <i class="fa-solid fa-magnifying-glass me-1"></i> ค้นหาข้อมูล
@@ -51,7 +51,7 @@
   </form>
 </div>
 
-<!-- Customers Table -->
+
 <div class="glass-card" id="customersContainer">
   <div class="table-responsive">
     <table class="table-excel text-light">
@@ -125,7 +125,7 @@
     </table>
   </div>
 
-  <!-- Pagination -->
+  
   <div id="paginationContainer">
     <% if (totalPages > 1) { %>
       <nav class="d-flex justify-content-center mt-4">
@@ -147,11 +147,9 @@
   </div>
 </div>
 
-<!-- ==========================================
-     MODALS
-     ========================================== -->
 
-<!-- Add Customer Modal -->
+
+
 <div class="modal fade" id="addCustomerModal" tabindex="-1" aria-labelledby="addCustomerModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content text-light" style="background: var(--bg-color); border: 1px solid var(--card-border); border-radius: 16px; backdrop-filter: var(--glass-blur);">
@@ -191,7 +189,7 @@
   </div>
 </div>
 
-<!-- Edit Customer Modal -->
+
 <div class="modal fade" id="editCustomerModal" tabindex="-1" aria-labelledby="editCustomerModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content text-light" style="background: var(--bg-color); border: 1px solid var(--card-border); border-radius: 16px; backdrop-filter: var(--glass-blur);">
@@ -232,7 +230,7 @@
   </div>
 </div>
 
-<!-- Fetch Actions JS -->
+
 <script>
   document.addEventListener('DOMContentLoaded', function() {
     

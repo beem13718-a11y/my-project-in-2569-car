@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 360" width="100%" height="100%">
+  <rect width="600" height="360" fill="#0f172a"/>
+  <circle cx="300" cy="175" r="110" fill="#1e293b" stroke="#38bdf8" stroke-width="3"/>
+  <!-- Oil Can & Golden Synthetic Oil Drop -->
+  <path d="M210,190 L270,150 L350,150 L375,180 L350,225 L220,225 Z" fill="#38bdf8"/>
+  <path d="M375,180 L430,155 L440,165 L375,200 Z" fill="#e2e8f0"/>
+  <path d="M180,160 L215,160 L215,210 L180,210 Z" fill="none" stroke="#94a3b8" stroke-width="10" stroke-linecap="round"/>
+  <path d="M442,185 C442,185 462,215 462,230 C462,242 452,252 442,252 C432,252 422,242 422,230 C422,215 442,185 442,185 Z" fill="#10b981"/>
+  <text x="300" y="325" text-anchor="middle" fill="#94a3b8" font-family="sans-serif" font-size="16" font-weight="bold">SYNTHETIC OIL &amp; 25-POINT CHECK</text>
+</svg>

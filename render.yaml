@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: smartgarage
+    runtime: docker
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: PORT
+        value: 3000
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: SHOP_ACCESS_KEY
+        value: sg2026
